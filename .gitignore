@@ -1,0 +1,8 @@
+*.lock
+nbproject/
+.DS_Store
+application/vendor/
+*.local.php
+phpinfo.php
+*.rpm
+.vagrant/
