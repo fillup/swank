@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Install Apache and PHP (and any needed extensions).
-sudo apt-get install -y git php5
+sudo apt-get install -y git php5 mysql-server
 
 # Mount synced folder as apache
 sudo mount -t vboxsf -o uid=`id -u www-data`,gid=`id -g www-data` /var/www/swank /var/www/swank
@@ -15,3 +15,6 @@ sudo a2ensite swank-vhost.conf
 
 # Restart Apache.
 sudo service apache2 restart
+
+# Create the necessary tables/users for MySQL.
+/vagrant/createdb.sh swank swank swank

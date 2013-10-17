@@ -1,0 +1,12 @@
+<?php
+
+return array(
+    'params' => array(
+        'github' => array(
+            'client_id' => '',
+            'client_secret' => '',
+            'return_path' => 'auth/return',
+            'scope' => 'user:email',
+        ),
+    ),
+);
