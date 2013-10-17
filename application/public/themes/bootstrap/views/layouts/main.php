@@ -62,7 +62,7 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
                         <span class="icon-bar"></span>
                     </button>
 
-                <a class="navbar-brand" href="<?php echo Yii::app()->baseUrl; ?>"><?php echo Yii::app()->name; ?></a>
+                <a class="navbar-brand" href="<?php echo Yii::app()->baseUrl; ?>">Swank</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -80,8 +80,8 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
                 <?php $this->widget('zii.widgets.CMenu',array(
                     'htmlOptions'=>array('class'=>'nav navbar-nav pull-right'),
                     'items'=>array(
-                        array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
-                        array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
+                        array('label'=>'Login', 'url'=>array('/auth/login'), 'visible'=>Yii::app()->user->isGuest),
+                        array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/auth/logout'), 'visible'=>!Yii::app()->user->isGuest)
                     ),
                 )); ?>
 
@@ -122,9 +122,22 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
         <?php endif?>
 
         <div id="main-content">
-
+            <div class="row">
+                <div class="col-md-12">
+                <?php
+                    foreach(Yii::app()->user->getFlashes() as $key => $message) {
+                    ?>
+                        <div class="alert alert-<?php echo $key; ?> alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <?php echo $message; ?>
+                        </div>
+                    <?php
+                    }
+                ?>
+                </div>
+            </div>
             <?php if (!$this->menu): ?>
-
+            
                 <div class="row">
                     <div class="col-lg-12">
                         <?php echo $content; ?>
