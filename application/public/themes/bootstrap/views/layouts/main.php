@@ -71,8 +71,8 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
                 <?php $this->widget('zii.widgets.CMenu',array(
                     'htmlOptions'=>array('class'=>'nav navbar-nav'),
                     'items'=>array(
-                        array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
-                        array('label'=>'Contact', 'url'=>array('/site/contact')),
+                        array('label'=>'Get Started', 'url'=>array('/gen')),
+                        array('label'=>'My Apps', 'url'=>array('/me'), 'visible'=>!Yii::app()->user->isGuest),
                     ),
                 )); ?>
 
@@ -80,6 +80,7 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
                 <?php $this->widget('zii.widgets.CMenu',array(
                     'htmlOptions'=>array('class'=>'nav navbar-nav pull-right'),
                     'items'=>array(
+                        array('label'=>'Fork Me', 'url'=>'http://github.com/'),
                         array('label'=>'Login', 'url'=>array('/auth/login'), 'visible'=>Yii::app()->user->isGuest),
                         array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/auth/logout'), 'visible'=>!Yii::app()->user->isGuest)
                     ),
