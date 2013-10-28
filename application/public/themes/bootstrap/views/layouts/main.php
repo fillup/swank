@@ -81,7 +81,7 @@ $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClie
                     'htmlOptions'=>array('class'=>'nav navbar-nav pull-right'),
                     'items'=>array(
                         array('label'=>'Fork Me', 'url'=>'http://github.com/'),
-                        array('label'=>'Login', 'url'=>array('/auth/login'), 'visible'=>Yii::app()->user->isGuest),
+                        array('label'=>'Login with GitHub', 'url'=>array('/auth/login'), 'visible'=>Yii::app()->user->isGuest, ),
                         array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/auth/logout'), 'visible'=>!Yii::app()->user->isGuest)
                     ),
                 )); ?>
