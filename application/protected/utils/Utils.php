@@ -66,4 +66,57 @@ Rand_Gen_Loop:
         }
         return date($shortDateFormat, $timeStamp);
     }
+    
+    /**
+     * When model validation errors occur, you can call $model->getErrors()
+     * The array returned is not friendly for display. This static method
+     * will pull out the error messages and create an unordered list of 
+     * class validation-errors and return the HTML.
+     * 
+     * @param array $errors
+     * @return string
+     */
+    public static function modelErrorsAsHtml($errors)
+    {
+        $response = "<ul class='validation-errors'>";
+        if(is_array($errors) && count($errors) >0){
+            foreach($errors as $field){
+                if(is_array($field)){
+                    foreach($field as $error){
+                        $response .= '<li>'.$error.'</li>';
+                    }
+                }
+            }
+        } else {
+            $response .= '<li>No validation errors found, perhaps something else went wrong?</li>';
+        }
+        
+        $response .= '</ul>';
+        return $response;
+    }
+    
+    /**
+     * When model validation errors occur, you can call $model->getErrors()
+     * The array returned is not friendly for display. This static method
+     * will pull out the error messages and create a flat array of just
+     * the messages.
+     * 
+     * @param array $errors
+     * @return array
+     */
+    public static function modelErrorsAsArray($errors)
+    {
+        $response = array();
+        if(is_array($errors) && count($errors) >0){
+            foreach($errors as $field){
+                if(is_array($field)){
+                    foreach($field as $error){
+                        $response[] = $error;
+                    }
+                }
+            }
+        } 
+        
+        return $response;
+    }
 }

@@ -20,6 +20,34 @@ class Api extends ApiBase
         return $newRules;
     }
     
+    public function beforeDelete()
+    {
+        parent::beforeDelete();
+        foreach($this->apiOperations as $apiOp){
+            $apiOp->delete();
+        }
+        return true;
+    }
+    
+    public function toArray()
+    {
+        $api = array(
+            'id' => $this->id,
+            'application_id' => $this->application_id,
+            'path' => $this->path,
+            'description' => $this->description,
+            'created' => $this->created,
+            'updated' => $this->updated,
+        );
+        
+        return $api;
+    }
+    
+    public function toJson()
+    {   
+        return CJSON::encode($this->toArray());
+    }
+    
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!

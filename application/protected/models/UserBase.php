@@ -12,6 +12,10 @@
  * @property string $last_login
  * @property string $role
  * @property integer $status
+ * @property string $api_token
+ *
+ * The followings are the available model relations:
+ * @property Application[] $applications
  */
 class UserBase extends CActiveRecord
 {
@@ -33,7 +37,7 @@ class UserBase extends CActiveRecord
 		return array(
 			array('name, email, role, status', 'required'),
 			array('status', 'numerical', 'integerOnly'=>true),
-			array('id', 'length', 'max'=>32),
+			array('id, api_token', 'length', 'max'=>32),
 			array('name', 'length', 'max'=>64),
 			array('email', 'length', 'max'=>128),
 			array('access_token', 'length', 'max'=>40),
@@ -41,7 +45,7 @@ class UserBase extends CActiveRecord
 			array('created, last_login', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, name, email, access_token, created, last_login, role, status', 'safe', 'on'=>'search'),
+			array('id, name, email, access_token, created, last_login, role, status, api_token', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -53,6 +57,7 @@ class UserBase extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'applications' => array(self::HAS_MANY, 'Application', 'user_id'),
 		);
 	}
 
@@ -70,6 +75,7 @@ class UserBase extends CActiveRecord
 			'last_login' => 'Last Login',
 			'role' => 'Role',
 			'status' => 'Status',
+			'api_token' => 'Api Token',
 		);
 	}
 
@@ -99,6 +105,7 @@ class UserBase extends CActiveRecord
 		$criteria->compare('last_login',$this->last_login,true);
 		$criteria->compare('role',$this->role,true);
 		$criteria->compare('status',$this->status);
+		$criteria->compare('api_token',$this->api_token,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

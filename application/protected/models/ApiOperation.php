@@ -20,6 +20,18 @@ class ApiOperation extends ApiOperationBase
         return $newRules;
     }
     
+    public function beforeDelete()
+    {
+        parent::beforeDelete();
+        foreach($this->apiParameters as $param){
+            $param->delete();
+        }
+        foreach($this->apiResponses as $resp){
+            $resp->delete();
+        }
+        return true;
+    }
+    
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!
