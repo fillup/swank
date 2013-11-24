@@ -1,8 +1,7 @@
 <?php
 
 class ApiController extends Controller
-{
-    
+{   
     public function actionApplication($id=false)
     {
         $req = Yii::app()->request;
@@ -11,10 +10,14 @@ class ApiController extends Controller
          * Validate API token before continuing
          */
         $api_token = $req->getParam('api_token',false);
-        $user = User::model()->findByAttributes(array('api_token' => $api_token));
+        if($api_token){
+            $user = User::model()->findByAttributes(array('api_token' => $api_token));
+        } else {
+            $user = false;
+        }
         if(!$user){
             $e = new \Exception('Invalid API Token',403);
-            $this->returnError($e);
+            $this->returnError($e,403);
         }
         
         /**
@@ -56,9 +59,11 @@ class ApiController extends Controller
                 } else {
                     $results = array(
                         'success' => true,
-                        'status' => 404,
+                        'status' => 200,
+                        'count' => 0,
+                        'data' => array(),
                     );
-                    $this->returnJson($results,404);
+                    $this->returnJson($results,200);
                 }
             }
         } elseif($req->isPostRequest && $id === false){

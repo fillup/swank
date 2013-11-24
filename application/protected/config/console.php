@@ -10,10 +10,7 @@ return array(
     // application components
     'components' => array(
         'db' => array(
-            'connectionString' => 'mysql:host=localhost;dbname=swank',
             'emulatePrepare' => true,
-            'username' => 'swank',
-            'password' => 'swank',
             'charset' => 'utf8',
             'tablePrefix' => '',
             'class'=>'CDbConnection',

@@ -47,10 +47,7 @@ return array(
         ),
         // uncomment the following to use a MySQL database
         'db' => array(
-            'connectionString' => 'mysql:host=localhost;dbname=swank',
             'emulatePrepare' => true,
-            'username' => 'swank',
-            'password' => 'swank',
             'charset' => 'utf8',
             'tablePrefix' => '',
             'class'=>'CDbConnection',
