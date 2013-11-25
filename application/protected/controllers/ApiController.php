@@ -2,32 +2,32 @@
 
 class ApiController extends Controller
 {   
+    private $_user;
+    
+//    public function __construct($id, $module = null)
+//    {
+//        parent::__construct($id, $module);
+//        $this->validateApiToken();
+//    }
+    
+    public function filters()
+    {
+        return array(
+            'validateApiToken',
+        );
+    }
+    
     public function actionApplication($id=false)
     {
         $req = Yii::app()->request;
-        
-        /**
-         * Validate API token before continuing
-         */
-        $api_token = $req->getParam('api_token',false);
-        if($api_token){
-            $user = User::model()->findByAttributes(array('api_token' => $api_token));
-        } else {
-            $user = false;
-        }
-        if(!$user){
-            $e = new \Exception('Invalid API Token',403);
-            $this->returnError($e,403);
-        }
-        
         /**
          * If user is working with speicific application, make sure they own it
          */
         if($id){
             $application = Application::model()->findByPk($id);
-            if(!$application || $application->user_id != $user->id){
+            if(!$application || $application->user_id != $this->_user->id){
                 $e = new \Exception('Invalid Application ID',404);
-                $this->returnError($e);
+                $this->returnError($e,404);
             }
         }
         
@@ -44,7 +44,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results);
             } else {
-                $apps = Application::model()->findAllByAttributes(array('user_id' => $user->id));
+                $apps = Application::model()->findAllByAttributes(array('user_id' => $this->_user->id));
                 if($apps){
                     $results = array(
                         'success' => true,
@@ -68,32 +68,29 @@ class ApiController extends Controller
             }
         } elseif($req->isPostRequest && $id === false){
             // Load parameters
-            $name = $req->getParam('name',false);
-            $description = $req->getParam('description', null);
-            $base_path = $req->getParam('base_path', false);
-            $resource_path = $req->getParam('resource_path', false);
-            $api_version = $req->getParam('api_version', false);
+            $name           = $req->getParam('name',false);
+            $description    = $req->getParam('description', null);
+            $base_path      = $req->getParam('base_path', false);
+            $resource_path  = $req->getParam('resource_path', false);
+            $api_version    = $req->getParam('api_version', false);
 
             // Clean any beginning/ending whitespace before validation
-            $name = $name ? trim($name) : $name;
-            $description = $description ? trim($description) : $description;
-            $base_path = $base_path ? trim($base_path) : $base_path;
-            $resource_path = $resource_path ? trim($resource_path) : $resource_path;
-            $api_version = $api_version ? trim($api_version) : $api_version;
+            $name           = $name ? trim($name) : $name;
+            $description    = $description ? trim($description) : $description;
+            $base_path      = $base_path ? trim($base_path) : $base_path;
+            $resource_path  = $resource_path ? trim($resource_path) : $resource_path;
+            $api_version    = $api_version ? trim($api_version) : $api_version;
             
             // This is a new Application, validate all fields
             if(!$name){
-                $e = new \Exception('Name is required',200);
-                $this->returnError($e);
+                $e = new \Exception('Name is required',400);
+                $this->returnError($e,400);
             } elseif(!$base_path){
-                $e = new \Exception('Base Path does not look like a url. Must start with either http:// or https://.',200);
-                $this->returnError($e);
+                $e = new \Exception('Base Path does not look like a url. Must start with either http:// or https://.',400);
+                $this->returnError($e,400);
             } elseif(!$resource_path){
-                $e = new \Exception('Resource Path should be a path relative to the Base Path, for example: /api',200);
-                $this->returnError($e);
-            } elseif(!$user_id){
-                $e = new \Exception('User ID is required');
-                $this->returnError($e);
+                $e = new \Exception('Resource Path should be a path relative to the Base Path, for example: /api',400);
+                $this->returnError($e,400);
             } else {
                 if(substr($base_path,-1) == '/'){
                     $base_path = substr($base_path, 0, -1);
@@ -104,13 +101,13 @@ class ApiController extends Controller
                 $app->api_version = $api_version;
                 $app->base_path = $base_path;
                 $app->resource_path = $resource_path;
-                $app->user_id = $user_id;
+                $app->user_id = $this->_user->id;
                 if($app->save()){
                     $results = array(
                         'success' => true,
-                        'application_id' => $app->id,
+                        'id' => $app->id,
                     );
-                    $this->returnJson($results);
+                    $this->returnJson($results,200);
                 } else {
                     $e = new \Exception("Unable to create new application record: ".print_r($app->getErrors(),true),205);
                     $this->returnError($e,400);
@@ -178,30 +175,12 @@ class ApiController extends Controller
         $req = Yii::app()->request;
         
         /**
-         * Make sure an API Token is present
-         */
-        $api_token = $req->getParam('api_token',false);
-        if(!$api_token){
-            $e = new \Exception('API Token is required for all API calls',403);
-            $this->returnError($e);
-        }
-        
-        /**
-         * Validate API token by retreiving user with the token
-         */
-        $user = User::model()->findByAttributes(array('api_token' => $api_token));
-        if(!$user){
-            $e = new \Exception('Invalid API token',403);
-            $this->returnError($e);
-        }
-        
-        /**
          * Load application model and validate user owns it
          */
         $application_id = $req->getParam('application_id',false);
         if($application_id){
             $application = Application::model()->findByPk($application_id);
-            if(!$application || $application->user_id != $user->id){
+            if(!$application || $application->user_id != $this->_user->id){
                 $e = new \Exception('Invalid Application ID',404);
                 $this->returnError($e);
             } 
@@ -286,7 +265,6 @@ class ApiController extends Controller
 
     public function returnJson($data, $status = 200)
     {
-
         // Set the content type header.
         header('Content-type: applicaton/json', true, $status);
 
@@ -305,6 +283,26 @@ class ApiController extends Controller
         );
 
         $this->returnJson($data, $status);
+    }
+    
+    public function filterValidateApiToken($filterChain)
+    {
+        /**
+         * Validate API token before continuing
+         */
+        $api_token = Yii::app()->request->getParam('api_token',false);
+        if($api_token){
+            $user = User::model()->findByAttributes(array('api_token' => $api_token));
+        } else {
+            $user = false;
+        }
+        if(!$user){
+            $e = new \Exception('Invalid API Token',403);
+            $this->returnError($e,403);
+        } else {
+            $this->_user = $user;
+            $filterChain->run();
+        }
     }
 
 }

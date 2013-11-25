@@ -41,7 +41,7 @@ return array(
             'showScriptName' => false,
             'rules' => array(
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
-                '<controller:\w+>/<action:\w+>/<id:[a-zA-Z0-9]{32}>' => '<controller>/<action>',
+                '<controller:\w+>/<action:\w+>/<id:[a-zA-Z0-9\-]{32}>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ),
         ),
