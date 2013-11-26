@@ -17,7 +17,7 @@ return array(
     ),
     'api3' => array(
         'id' => 'fbd430a45907eb2cd1c6bd4fe4422222',
-        'application_id' => 'fbd430a45907eb2cd1c6bd4fe4422222',
+        'application_id' => 'fbd430a45907eb2cd1c6bd4fe4433333',
         'description' => 'unit test api 3',
         'created' => date('Y-m-d H:m:i',time()),
         'updated' => date('Y-m-d H:m:i',time()),

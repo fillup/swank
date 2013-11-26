@@ -106,9 +106,9 @@ class ApiTest extends CDbTestCase
          * Make sure response is successful
          */
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertNotNull($data['id']);
+        $this->assertNotNull($data['data']['id']);
         
-        $url .= '/'.$data['id'];
+        $url .= '/'.$data['data']['id'];
         
         /**
          * Next, lets update the created application
@@ -153,11 +153,193 @@ class ApiTest extends CDbTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
     
+    public function testApiGetList()
+    {
+        $user = $this->users['user1'];
+        $application = $this->applications['app1'];
+        $url = 'http://swank.local/api/api';
+        $response = Guzzle::get($url, array(
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'application_id' => $application['id'],
+            ),
+        ));
+        
+        /**
+         * Make sure HTTP status code is successful
+         */
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        /**
+         * Make sure only selected user's application apis are returned
+         */
+        $expectedCount = $this->getApiFixtureCountForApp($application['id']);
+        $data = $response->json();
+        $this->assertEquals($expectedCount, $data['count']);
+    }
+    
+    public function testApiGetSingle()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api1'];
+        $url = 'http://swank.local/api/api';
+        $response = Guzzle::get($url, array(
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'id' => $api['id'],
+            ),
+        ));
+        $data = $response->json();
+        
+        /**
+         * Make sure HTTP status code is successful
+         */
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        /**
+         * Make sure only one api is returned
+         */
+        $this->assertEquals(1,$data['count']);
+        
+        /**
+         * Make sure api returned is one expected
+         */
+        $this->assertEquals($api['id'], $data['data'][0]['id']);
+    }
+    
+    public function testApiGetListOtherUserApplication()
+    {
+        $user = $this->users['user1'];
+        $app = $this->applications['app3'];
+        $url = 'http://swank.local/api/api';
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'application_id' => $app['id'],
+            )
+        ));
+        $response = $request->send();
+        
+        /**
+         * Make sure HTTP status code is not found
+         */
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+    
+    public function testApiGetSingleOtherUserApi()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api3'];
+        $url = 'http://swank.local/api/api/'.$api['id'];
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            )
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        
+        /**
+         * Make sure result is 404 since it is invalid api id
+         */
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+    
+    public function testApiPostPutDelete()
+    {
+        $user = $this->users['user1'];
+        $app = $this->applications['app1'];
+        $api = array(
+            'path' => '/api/{api_id}',
+            'description' => 'This is an api for unit test purposes',
+            'application_id' => $app['id'],
+        );
+        
+        /**
+         * First, create a new application
+         */
+        $url = 'http://swank.local/api/api';        
+        $client = new Guzzle\Http\Client();
+        $request = $client->post($url,null,$api,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            )
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        /**
+         * Make sure response is successful
+         */
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotNull($data['data']['id']);
+        
+        $url .= '/'.$data['data']['id'];
+        
+        /**
+         * Next, lets update the created application
+         */
+        $updated = array(
+            'description' => 'Updated via put',
+        );
+        $request = $client->put($url,null,$updated,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            )
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        
+        /**
+         * Make sure response is successful
+         */
+        if($response->getStatusCode() != 200){
+            print_r($data);
+        }
+        $this->assertEquals(200, $response->getStatusCode());
+
+        /**
+         * Finally, delete the created application
+         */
+        $request = $client->delete($url,null,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            )
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        
+        if($response->getStatusCode() != 200){
+            print_r($data);
+        }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertTrue($data['success']);
+    }
+    
     public function getAppFixtureCountForUser($user_id)
     {
         $count = 0;
         foreach($this->applications as $app){
             if($app['user_id'] == $user_id){
+                $count++;
+            }
+        }
+        
+        return $count;
+    }
+    
+    public function getApiFixtureCountForApp($application_id)
+    {
+        $count = 0;
+        
+        foreach($this->apis as $api){
+            if($api['application_id'] == $application_id){
                 $count++;
             }
         }

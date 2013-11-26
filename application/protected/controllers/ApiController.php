@@ -2,13 +2,12 @@
 
 class ApiController extends Controller
 {   
+    /**
+     * After validateApiToken filter is run, $_user will store the
+     * authenticated user based on api_token
+     * @var User
+     */
     private $_user;
-    
-//    public function __construct($id, $module = null)
-//    {
-//        parent::__construct($id, $module);
-//        $this->validateApiToken();
-//    }
     
     public function filters()
     {
@@ -105,7 +104,9 @@ class ApiController extends Controller
                 if($app->save()){
                     $results = array(
                         'success' => true,
-                        'id' => $app->id,
+                        'status' => 200,
+                        'count' => 1,
+                        'data' => $app->toArray(),
                     );
                     $this->returnJson($results,200);
                 } else {
@@ -165,7 +166,7 @@ class ApiController extends Controller
             }
         } else {
             $e = new \Exception('Not a supported method. Supported methods are GET, POST, PUT, DELETE.',215);
-            $this->returnError($e,400);
+            $this->returnError($e,405);
         }
         
     }
@@ -182,8 +183,19 @@ class ApiController extends Controller
             $application = Application::model()->findByPk($application_id);
             if(!$application || $application->user_id != $this->_user->id){
                 $e = new \Exception('Invalid Application ID',404);
-                $this->returnError($e);
+                $this->returnError($e,404);
             } 
+        }
+        
+        /**
+         * If API ID provided, make sure user can edit it
+         */
+        if($id){
+            $api = Api::model()->findByPk($id);
+            if(!$api || $api->application->user_id != $this->_user->id){
+                $e = new \Exception('Invalid Api ID',404);
+                $this->returnError($e,404);
+            }
         }
         
         /**
@@ -200,21 +212,23 @@ class ApiController extends Controller
                 $e = new \Exception('Listing APIs requires an application_id or an api_id',400);
                 $this->returnError($e);
             }
+            $data = array();
             $apis = Api::model()->findAllByAttributes($attributes);
             if($apis){
-                $results = array(
-                    'success' => true,
-                    'status' => 200,
-                    'count' => count($apis),
-                    'data' => array()
-                );
                 foreach($apis as $api){
-                    $results['data'][] = $api->toArray();
+                    if($api->application->user_id == $this->_user->id){
+                        $data[] = $api->toArray();
+                    }
                 }
-            } else {
-                $e = new \Exception('No APIs found',404);
-                $this->returnError($e);
+                
             }
+            
+            $results = array(
+                'success' => true,
+                'status' => 200,
+                'count' => count($data),
+                'data' => $data,
+            );
             
             $this->returnJson($results,$results['status']);
         } elseif ($req->isPostRequest){
@@ -260,6 +274,49 @@ class ApiController extends Controller
                 
                 $this->returnJson($results,$results['status']);
             }
+        } elseif ($req->isPutRequest){
+            if(!$id){
+                $e = new \Exception('Api ID is required to update',400);
+                $this->returnError($e,400);
+            }
+            
+            // Load parameters
+            $description = $req->getPut('description', null);
+            $path = $req->getPut('path', false);
+
+            // Clean any beginning/ending whitespace before validation
+            $description = $description ? trim($description) : $description;
+            $path = $path ? trim($path) : $path;
+            
+            $api->description = $description ?: $api->description;
+            $api->path = $path ?: $api->path;
+            if($api->save()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to update api: ".Utils::modelErrorsAsArray($api->getErrors()),500);
+                $this->returnError($e,500);
+            }
+        } elseif ($req->isDeleteRequest){
+            if(!$id){
+                $e = new \Exception('Api ID is required to update',400);
+                $this->returnError($e,400);
+            }
+            
+            if($api->delete()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to delete api: ".Utils::modelErrorsAsArray($application->getErrors()),500);
+                $this->returnError($e);
+            }
+        } else {
+            $e = new \Exception('Invalid request method', 405);
+            $this->returnError($e, 405);
         }
     }
 
