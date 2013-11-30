@@ -311,7 +311,197 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete api: ".Utils::modelErrorsAsArray($application->getErrors()),500);
+                $e = new \Exception("Unable to delete api: ".Utils::modelErrorsAsArray($api->getErrors()),500);
+                $this->returnError($e);
+            }
+        } else {
+            $e = new \Exception('Invalid request method', 405);
+            $this->returnError($e, 405);
+        }
+    }
+    
+    public function actionApiOperation($id=false)
+    {
+        $req = Yii::app()->request;
+        
+        /**
+         * Load api model and validate user owns it
+         */
+        $api_id = $req->getParam('api_id',false);
+        if($api_id){
+            $api = Api::model()->findByPk($api_id);
+            if(!$api || $api->application->user_id != $this->_user->id){
+                $e = new \Exception('Invalid Api ID',404);
+                $this->returnError($e,404);
+            }
+        }
+        
+        /**
+         * If ApiOperation ID provided, make sure user can edit it
+         */
+        if($id){
+            $operation = ApiOperation::model()->findByPk($id);
+            if(!$operation || $operation->api->application->user_id != $this->_user->id){
+                $e = new \Exception('Invalid Api Operation ID',404);
+                $this->returnError($e,404);
+            }
+        }
+        
+        /**
+         * For get requests, if ID is not provided return a list of 
+         * operations for given api_id. If ID is provided, only return
+         * details for given api operation
+         */
+        if(strtoupper($req->requestType) == 'GET'){
+            $attributes = array();
+            if($id){
+                $attributes['id'] = $id;
+            } elseif($api_id){
+                $attributes['api_id'] = $api_id;
+            } else {
+                $e = new \Exception('Listing Api Operations requires an api_id or an api_operation_id',400);
+                $this->returnError($e);
+            }
+            $data = array();
+            $operations = ApiOperation::model()->findAllByAttributes($attributes);
+            if($operations){
+                foreach($operations as $operation){
+                    if($operation->api->application->user_id == $this->_user->id){
+                        $data[] = $operation->toArray();
+                    }
+                }
+            }
+            
+            $results = array(
+                'success' => true,
+                'status' => 200,
+                'count' => count($data),
+                'data' => $data,
+            );
+            
+            $this->returnJson($results,$results['status']);
+        } elseif($req->isPostRequest){
+            /**
+             * Create a new API Operation
+             */
+            $method = $req->getParam('method', false);
+            $nickname = $req->getParam('nickname', false);
+            $type = $req->getParam('type',false);
+            $summary = $req->getParam('summary',null);
+            $notes = $req->getParam('notes',null);
+            
+            
+            if(!$api_id){
+                $e = new \Exception('Creating a new API Operation requires an api_id',400);
+                $this->returnError($e);
+            } elseif(!$method){
+                $e = new \Exception('A method is required.',400);
+                $this->returnError($e);
+            } elseif(!$nickname){
+                $e = new \Exception('A nickname is required.',400);
+                $this->returnError($e);
+            } elseif(!$method){
+                $e = new \Exception('A type is required.',400);
+                $this->returnError($e);
+            } else {
+                /**
+                 * Make sure an API operation with this method doesnt already
+                 * exist.
+                 */
+                $check = ApiOperation::model()->findByAttributes(array(
+                    'api_id' => $api_id,
+                    'method' => strtoupper($method),
+                ));
+                if($check){
+                    $e = new \Exception('An API operation with method '
+                            .CHtml::encode(strtoupper($method))
+                            .' for this API already exists, nickname: '
+                            .$check->nickname);
+                    $this->returnError($e);
+                }
+                /**
+                 * Create new Api Operation record
+                 */
+                $op = new ApiOperation();
+                $op->api_id = $api_id;
+                $op->method = strtoupper($method);
+                $op->nickname = $nickname;
+                $op->type = $type;
+                $op->summary = $summary;
+                $op->notes = $notes;
+                try{
+                    if($op->save()){
+                        $results = array(
+                            'success' => true,
+                            'status' => 200,
+                            'count' => 1,
+                            'data' => $op->toArray(),
+                        );
+                    } else {
+                        $results = array(
+                            'success' => false,
+                            'status' => 500,
+                            'errors' => Utils::modelErrorsAsArray($op->getErrors()),
+                        );
+                    }
+                } catch (\Exception $e){
+                    $results = array(
+                        'success' => false,
+                        'status' => 500,
+                        'errors' => Utils::modelErrorsAsArray($op->getErrors()),
+                    );
+                }
+                
+                $this->returnJson($results,$results['status']);
+            }
+        } elseif($req->isPutRequest){
+            if(!$id){
+                $e = new \Exception('Api Operation ID is required to update',400);
+                $this->returnError($e,400);
+            }
+            
+            // Load parameters
+            $method = $req->getPut('method', false);
+            $nickname = $req->getPut('nickname', false);
+            $type = $req->getPut('type',false);
+            $summary = $req->getPut('summary',false);
+            $notes = $req->getPut('notes',false);
+
+            // Clean any beginning/ending whitespace before validation
+            $method = $method ? trim(strtoupper($method)) : $method;
+            $nickname = $nickname ? trim($nickname) : $nickname;
+            $type = $type ? trim($type) : $type;
+            $summary = $summary ? trim($summary) : $summary;
+            $notes = $notes ? trim($notes) : $notes;
+            
+            $operation->method = $method ?: $operation->method;
+            $operation->nickname = $nickname ?: $operation->nickname;
+            $operation->type = $type ?: $operation->type;
+            $operation->summary = $summary ?: $operation->summary;
+            $operation->notes = $notes ?: $operation->notes;
+            
+            if($operation->save()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to update api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),500);
+                $this->returnError($e,500);
+            }
+        } elseif($req->isDeleteRequest) {
+            if(!$id){
+                $e = new \Exception('Api Operation ID is required to update',400);
+                $this->returnError($e,400);
+            }
+            
+            if($operation->delete()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to delete api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),500);
                 $this->returnError($e);
             }
         } else {

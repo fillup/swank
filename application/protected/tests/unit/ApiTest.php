@@ -6,6 +6,7 @@ class ApiTest extends CDbTestCase
         'users' => 'User',
         'applications' => 'Application',
         'apis' => 'Api',
+        'api_operations' => 'ApiOperation',
     );
     
     public static function setUpBeforeClass()
@@ -320,6 +321,167 @@ class ApiTest extends CDbTestCase
         }
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($data['success']);
+    }
+    
+    public function testGetApiOperationListWithoutId()
+    {
+        $user = $this->users['user1'];
+        
+        $url = 'http://swank.local/api/apiOperation';        
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        $this->assertEquals(400, $response->getStatusCode());
+    }
+    
+    public function testGetApiOperationList()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api1'];
+        
+        $url = 'http://swank.local/api/apiOperation';        
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'api_id'    => $api['id'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        $this->assertEquals(2, $data['count']);
+    }
+    
+    public function testGetSingleApiOperation()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api1'];
+        $op = $this->api_operations['op1'];
+        
+        $url = 'http://swank.local/api/apiOperation/'.$op['id'];
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        
+        $this->assertEquals(1,$data['count']);
+        $this->assertEquals($op['id'], $data['data'][0]['id']);
+    }
+    
+    public function testCreateUpdateDeleteApiOperation()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api1'];
+        
+        $operation = array(
+            'api_id' => $api['id'],
+            'method' => 'PUT',
+            'nickname' => 'updateApiOperation',
+            'type' => 'testomg',
+            'summary' => 'this is the summary',
+            'notes' => 'these are some notes',
+        );
+        
+        /**
+         * First lets create the Api Operation
+         */
+        $url = 'http://swank.local/api/apiOperation';
+        $client = new Guzzle\Http\Client();
+        $request = $client->post($url,null,$operation,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        if($response->getStatusCode() != 200){
+            print_r($data);
+        }
+        $this->assertEquals(1,$data['count']);
+        $this->assertNotNull($data['data']['id']);
+        
+        /**
+         * Now lets update it
+         */
+        $url .= '/'.$data['data']['id'];
+        $update = array(
+            'summary' => 'updating the summary',
+        );
+        $request = $client->put($url, null, $update, array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        if($response->getStatusCode() != 200){
+            print_r($response->getBody(true));
+        }
+        $this->assertEquals(200,$response->getStatusCode());
+        
+        /**
+         * Finally lets delete the api operation
+         */
+        $request = $client->delete($url, null, null, array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        if($response->getStatusCode() != 200){
+            print_r($response->getBody(true));
+        }
+        $this->assertEquals(200,$response->getStatusCode());
+    }
+    
+    public function testGetApiOperationOtherUser()
+    {
+        $user = $this->users['user1'];
+        $api = $this->apis['api3'];
+        
+        $url = 'http://swank.local/api/apiOperation';        
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'api_id'    => $api['id'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+    
+    public function testDeleteApiOperationOtherUser()
+    {
+        $user = $this->users['user1'];
+        $op = $this->api_operations['op3'];
+        
+        $url = 'http://swank.local/api/apiOperation/'.$op['id'];        
+        $client = new Guzzle\Http\Client();
+        $request = $client->delete($url,null,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        $this->assertEquals(404, $response->getStatusCode());
     }
     
     public function getAppFixtureCountForUser($user_id)

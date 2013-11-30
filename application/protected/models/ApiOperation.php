@@ -20,6 +20,28 @@ class ApiOperation extends ApiOperationBase
         return $newRules;
     }
     
+    public function toArray()
+    {
+        $data = array(
+            'id' => $this->id,
+            'api_id' => $this->api_id,
+            'method' => $this->method,
+            'nickname' => $this->nickname,
+            'type' => $this->type,
+            'summary' => $this->summary,
+            'notes' => $this->notes,
+            'created' => $this->created,
+            'updated' => $this->updated,
+        );
+        
+        return $data;
+    }
+    
+    public function toJson()
+    {
+        return CJSON::encode($this->toArray());
+    }
+    
     public function beforeDelete()
     {
         parent::beforeDelete();
