@@ -509,6 +509,73 @@ class ApiController extends Controller
             $this->returnError($e, 405);
         }
     }
+    
+    public function actionApiParameter($id=false)
+    {
+        $req = Yii::app()->request;
+        
+        /**
+         * Load api model and validate user owns it
+         */
+        $operation_id = $req->getParam('operation_id',false);
+        if($operation_id){
+            $op = ApiOperation::model()->findByPk($operation_id);
+            if(!$op || $op->api->application->user_id != $this->_user->id){
+                $e = new \Exception('Invalid Api Operation ID',404);
+                $this->returnError($e,404);
+            }
+        }
+        
+        /**
+         * If ApiParameter ID provided, make sure user can edit it
+         */
+        if($id){
+            $api_param = ApiParameter::model()->findByPk($id);
+            if(!$api_param || $api_param->operation->api->application->user_id != $this->_user->id){
+                $e = new \Exception('Invalid Api Parameter ID',404);
+                $this->returnError($e,404);
+            }
+        }
+        
+        /**
+         * For get requests, if ID is not provided return a list of 
+         * parameters for given api_operation_id. If ID is provided, only return
+         * details for given api operation
+         */
+        if(strtoupper($req->requestType) == 'GET'){
+            $attributes = array();
+            if($id){
+                $attributes['id'] = $id;
+            } elseif($operation_id){
+                $attributes['operation_id'] = $operation_id;
+            } else {
+                $e = new \Exception('Listing Api Parameters requires an id or an operation_id',400);
+                $this->returnError($e);
+            }
+            $data = array();
+            $params = ApiParameter::model()->findAllByAttributes($attributes);
+            if($params){
+                foreach($params as $api_param){
+                    if($api_param->operation->api->application->user_id == $this->_user->id){
+                        $data[] = $api_param->toArray();
+                    }
+                }
+            }
+            
+            $results = array(
+                'success' => true,
+                'status' => 200,
+                'count' => count($data),
+                'data' => $data,
+            );
+            
+            $this->returnJson($results,$results['status']);
+        } else {
+            $e = new \Exception('Invalid request method', 405);
+            $this->returnError($e, 405);
+        }
+        
+    }
 
     public function returnJson($data, $status = 200)
     {

@@ -20,6 +20,32 @@ class ApiParameter extends ApiParameterBase
         return $newRules;
     }
     
+    public function toArray()
+    {
+        $data = array(
+            'id' => $this->id,
+            'operation_id' => $this->operation_id,
+            'paramType' => $this->paramType,
+            'name' => $this->name,
+            'description' => $this->description,
+            'dataType' => $this->dataType,
+            'format' => $this->format,
+            'required' => $this->required,
+            'minimum' => $this->minimum,
+            'maximum' => $this->maximum,
+            'enum' => $this->enum,
+            'created' => $this->created,
+            'updated' => $this->updated,
+        );
+        
+        return $data;
+    }
+    
+    public function toJson()
+    {
+        return CJSON::encode($this->toArray());
+    }
+    
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!

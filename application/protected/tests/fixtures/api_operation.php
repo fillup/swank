@@ -3,7 +3,7 @@
 return array(
     'op1' => array(
         'id' => 'kjfjwjfjbjrlwfdsfeegs9235j21jf0f',
-        'api_id' => '17eaf950fbf49d046ebfe4da79e95bda', //api1
+        'api_id' => '17eaf950fbf49d046ebfe4da79e95bda', //op1
         'method' => 'GET',
         'nickname' => 'getApiOperations',
         'type' => 'testing',
@@ -14,7 +14,7 @@ return array(
     ),
     'op2' => array(
         'id' => 'kjfjwjfjbjrlwfdsfeegs9235j29unki',
-        'api_id' => '17eaf950fbf49d046ebfe4da79e95bda', //api1
+        'api_id' => '17eaf950fbf49d046ebfe4da79e95bda', //op1
         'method' => 'POST',
         'nickname' => 'createApiOperation',
         'type' => 'testing',
@@ -25,7 +25,7 @@ return array(
     ),
     'op3' => array(
         'id' => 'kjfjwjfjbjrlwfdsfeegs9235j20kubr',
-        'api_id' => 'fbd430a45907eb2cd1c6bd4fe4422222', //api3
+        'api_id' => 'fbd430a45907eb2cd1c6bd4fe4422222', //op3
         'method' => 'POST',
         'nickname' => 'createApiOperation',
         'type' => 'testing',

@@ -7,6 +7,7 @@ class ApiTest extends CDbTestCase
         'applications' => 'Application',
         'apis' => 'Api',
         'api_operations' => 'ApiOperation',
+        'api_parameters' => 'ApiParameter',
     );
     
     public static function setUpBeforeClass()
@@ -483,6 +484,48 @@ class ApiTest extends CDbTestCase
         $data = $response->json();
         $this->assertEquals(404, $response->getStatusCode());
     }
+    
+    public function testGetParameterList()
+    {
+        $user = $this->users['user1'];
+        $op = $this->api_operations['op1'];
+        
+        $url = 'http://swank.local/api/apiParameter';        
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+                'operation_id'    => $op['id'],
+            ),
+        ));
+        $response = $request->send();
+        $data = $response->json();
+        $this->assertEquals(2, $data['count']);
+    }
+    
+    public function testGetSingleParameterOtherUser()
+    {
+        $user = $this->users['user1'];
+        $api_param = $this->api_parameters['param3'];
+        
+        $url = 'http://swank.local/api/apiParameter/'.$api_param['id'];
+        $client = new Guzzle\Http\Client();
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        
+        $response = $request->send();
+        $data = $response->json();
+        if($response->getStatusCode() != 404){
+            print_r($data);
+        }
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+    
     
     public function getAppFixtureCountForUser($user_id)
     {
