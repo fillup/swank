@@ -3,6 +3,7 @@ nbproject/
 .DS_Store
 application/vendor/
 *.local.php
+local.php
 phpinfo.php
 *.rpm
 .vagrant/

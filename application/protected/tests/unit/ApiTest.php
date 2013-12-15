@@ -531,7 +531,7 @@ class ApiTest extends CDbTestCase
         $user = $this->users['user1'];
         $op = $this->api_operations['op1'];
         
-        $url = 'http://swank.local/api/apiParameter/';
+        $url = 'http://swank.local/api/apiParameter';
         $client = new Guzzle\Http\Client();
         
         /**
@@ -559,6 +559,57 @@ class ApiTest extends CDbTestCase
             print_r($data);
         }
         $this->assertEquals(200, $response->getStatusCode());
+        
+        /**
+         * Now update the parameter
+         */
+        $url .= '/'.$data['data']['id'];
+        $update = array(
+            'description' => 'updating the description',
+        );
+        $request = $client->put($url, null, $update, array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        if($response->getStatusCode() != 200){
+            print_r($response->getBody(true));
+        }
+        $this->assertEquals(200,$response->getStatusCode());
+        
+        /**
+         * Now lets delete the parameter
+         */
+        $request = $client->delete($url, null, null, array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        $response = $request->send();
+        if($response->getStatusCode() != 200){
+            print_r($response->getBody(true));
+        }
+        $this->assertEquals(200,$response->getStatusCode());
+        
+        /**
+         * Now try to fetch original parameter and ensure we get a 404
+         */
+        $request = $client->get($url,null,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        
+        $response = $request->send();
+        $data = $response->json();
+        if($response->getStatusCode() != 404){
+            print_r($data);
+        }
+        $this->assertEquals(404, $response->getStatusCode());
     }
     
     

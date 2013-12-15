@@ -526,7 +526,7 @@ class ApiController extends Controller
             }
         } elseif($req->isDeleteRequest) {
             if(!$id){
-                $e = new \Exception('Api Operation ID is required to update',400);
+                $e = new \Exception('Api Operation ID is required to delete',400);
                 $this->returnError($e,400);
             }
             
@@ -709,6 +709,57 @@ class ApiController extends Controller
                 }
                 
                 $this->returnJson($results,$results['status']);
+            }
+        } elseif($req->isPutRequest){
+            if(!$id){
+                $e = new \Exception('Api Parameter ID is required to update',400);
+                $this->returnError($e,400);
+            }
+            
+            // Load parameters
+            $paramType = $req->getPut('paramType', false);
+            $name = $req->getPut('name', false);
+            $description = $req->getPut('description',false);
+            $dataType = $req->getPut('dataType',false);
+            $format = $req->getPut('format',false);
+            $required = $req->getPut('required',null);
+            $minimum = $req->getPut('minimum',false);
+            $maximum = $req->getPut('maximum',false);
+            $enum = $req->getPut('enum',false);
+            
+            $api_param->paramType = $paramType ?: $api_param->paramType;
+            $api_param->name = $name ?: $api_param->name;
+            $api_param->description = $description ?: $api_param->description;
+            $api_param->dataType = $dataType ?: $api_param->dataType;
+            $api_param->format = $format ?: $api_param->format;
+            $api_param->required = !is_null($required) && is_bool($required) ? $required : $api_param->required;
+            $api_param->minimum = $minimum ?: $api_param->minimum;
+            $api_param->maximum = $maximum ?: $api_param->maximum;
+            $api_param->enum = $enum ?: $api_param->enum;
+            
+            if($api_param->save()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to update api parameter: ".Utils::modelErrorsAsArray($api_param->getErrors()),500);
+                $this->returnError($e,500);
+            }
+        } elseif($req->isDeleteRequest) {
+            if(!$id){
+                $e = new \Exception('Api Parameter ID is required to delete',400);
+                $this->returnError($e,400);
+            }
+            
+            if($api_param->delete()){
+                $results = array(
+                    'success' => true
+                );
+                $this->returnJson($results, 200);
+            } else {
+                $e = new \Exception("Unable to delete api parameter: ".Utils::modelErrorsAsArray($api_param->getErrors()),500);
+                $this->returnError($e);
             }
         } else {
             $e = new \Exception('Invalid request method', 405);
