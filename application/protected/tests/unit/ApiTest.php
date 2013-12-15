@@ -526,6 +526,41 @@ class ApiTest extends CDbTestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
     
+    public function testParameterCreate()
+    {
+        $user = $this->users['user1'];
+        $op = $this->api_operations['op1'];
+        
+        $url = 'http://swank.local/api/apiParameter/';
+        $client = new Guzzle\Http\Client();
+        
+        /**
+         * First test creating a parameter
+         */
+        $parameter = array(
+            'operation_id' => $op['id'],
+            'paramType' => 'query',
+            'name' => 'userName',
+            'description' => 'User\'s username',
+            'dataType' => 'string',
+            'format' => 'string',
+            'required' => true
+        );
+        $request = $client->post($url,null,$parameter,array(
+            'exceptions' => false,
+            'query' => array(
+                'api_token' => $user['api_token'],
+            ),
+        ));
+        
+        $response = $request->send();
+        $data = $response->json();
+        if($response->getStatusCode() != 200){
+            print_r($data);
+        }
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+    
     
     public function getAppFixtureCountForUser($user_id)
     {

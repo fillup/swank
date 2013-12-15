@@ -32,7 +32,17 @@ class ApiOperation extends ApiOperationBase
             'notes' => $this->notes,
             'created' => $this->created,
             'updated' => $this->updated,
+            'parameters' => array(),
+            'errorResponses' => array(),
         );
+        
+        foreach($this->apiParameters as $param){
+            $data['parameters'][] = $param->toArray();
+        }
+        
+        foreach($this->apiResponses as $resp){
+            $data['errorResponses'][] = $resp->toArray();
+        }
         
         return $data;
     }
@@ -40,6 +50,29 @@ class ApiOperation extends ApiOperationBase
     public function toJson()
     {
         return CJSON::encode($this->toArray());
+    }
+    
+    public function toSwagger()
+    {
+        $op = array(
+            'method' => strtoupper($this->method),
+            'nickname' => $this->nickname,
+            'type' => $this->type,
+            'parameters' => array(),
+            'summary' => $this->summary,
+            'notes' => $this->notes,
+            'errorResponses' => array(),
+        );
+        
+        foreach($this->apiParameters as $param){
+            $op['parameters'][] = $param->toSwagger();
+        }
+        
+        foreach($this->apiResponses as $resp){
+            $op['errorResponses'][] = $resp->toSwagger();
+        }
+        
+        return $op;
     }
     
     public function beforeDelete()

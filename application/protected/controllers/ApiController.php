@@ -9,6 +9,28 @@ class ApiController extends Controller
      */
     private $_user;
     
+    /**
+     * List of valid paramType options, for use in actionApiParameter mainly
+     * @var array
+     */
+    public $validParamTypes = array('path','query','body','header','form');
+    
+    /**
+     * List of valid data types and formats
+     * @var array
+     */
+    public $validDataTypes = array(
+        'integer'   => array('integer','int32'),
+        'long'      => array('integer','int64'),
+        'float'     => array('number','float'),
+        'double'    => array('number','double'),
+        'string'    => array('string'),
+        'byte'      => array('string','byte'),
+        'boolean'   => array('boolean'),
+        'date'      => array('string','date'),
+        'dateTime'  => array('string','date-time'),
+    );
+    
     public function filters()
     {
         return array(
@@ -32,17 +54,30 @@ class ApiController extends Controller
         
         if(strtoupper($req->requestType) == 'GET'){
             /**
-             * List application(s)
+             * Show single application
              */
             if($id){
-                $results = array(
-                    'success' => true,
-                    'status' => 200,
-                    'count' => 1,
-                    'data' => $application->toArray(),
-                );
-                $this->returnJson($results);
+                /**
+                 * Swagger param indicates whether it should only return
+                 * swagger api definition
+                 */
+                $swagger = $req->getParam('swagger',false);
+                if($swagger){
+                    $spec = $application->toSwagger();
+                    $this->returnJson($spec);
+                } else {
+                    $results = array(
+                        'success' => true,
+                        'status' => 200,
+                        'count' => 1,
+                        'data' => $application->toArray(),
+                    );
+                    $this->returnJson($results);
+                }
             } else {
+                /**
+                * List application(s)
+                */
                 $apps = Application::model()->findAllByAttributes(array('user_id' => $this->_user->id));
                 if($apps){
                     $results = array(
@@ -570,6 +605,111 @@ class ApiController extends Controller
             );
             
             $this->returnJson($results,$results['status']);
+        } elseif($req->isPostRequest){
+            /**
+             * Create a new API Parameter
+             */
+            $paramType = $req->getParam('paramType', false);
+            $name = $req->getParam('name', false);
+            $description = $req->getParam('description',false);
+            $dataType = $req->getParam('dataType',null);
+            $format = $req->getParam('format',null);
+            $required = $req->getParam('required',true);
+            $minimum = $req->getParam('minimum',null);
+            $maximum = $req->getParam('maximum',null);
+            $enum = $req->getParam('enum',null);
+            
+            if(!$operation_id){
+                $e = new \Exception('Creating a new API Parameter requires an operation_id',400);
+                $this->returnError($e);
+            } elseif(!$paramType || !in_array($paramType, $this->validParamTypes)){
+                $e = new \Exception('A valid param type is required (path,query,body,header,form).',400);
+                $this->returnError($e);
+            } elseif(!$name){
+                $e = new \Exception('A name is required.',400);
+                $this->returnError($e);
+            } elseif(!$description){
+                $e = new \Exception('Description is required.',400);
+                $this->returnError($e);
+            } elseif(!$dataType || !in_array($dataType, array_keys($this->validDataTypes))){
+                $e = new \Exception('A valid data type is required ('
+                        . implode(',', array_keys($this->validDataTypes)).').',400);
+                $this->returnError($e);
+            } elseif(!$format){
+                $e = new \Exception('Format is required.',400);
+                $this->returnError($e);
+            } else {
+                /**
+                 * Make sure an API operation with this method doesnt already
+                 * exist.
+                 */
+                $check = ApiParameter::model()->findByAttributes(array(
+                    'operation_id' => $operation_id,
+                    'name' => $name,
+                ));
+                if($check){
+                    $e = new \Exception('An API parameter with name '
+                            .CHtml::encode($name)
+                            .' for this API Operation ('
+                            .CHtml::encode($check->operation->nickname)
+                            .') already exists for method:'. CHtml::encode($check->operation->method));
+                    $this->returnError($e);
+                }
+                
+                /**
+                 * Additional conditional validation 
+                 */
+                // Flatten enum options into comma-separated string
+                if(is_array($enum)){
+                    $enum = implode(',', $enum);
+                }
+                // Check that format is valid for dataType
+                if(!in_array($format,$this->validDataTypes[$dataType])){
+                    $e = new \Exception('A valid format is required for dataType '
+                            .CHtml::encode($dataType).': '
+                            .array_values($this->validDataTypes[$dataType]),400);
+                    $this->returnError($e);
+                }
+                
+                /**
+                 * Create new Api Parameter record
+                 */
+                $param = new ApiParameter();
+                $param->operation_id = $operation_id;
+                $param->paramType = $paramType;
+                $param->name = $name;
+                $param->description = $description;
+                $param->dataType = $dataType;
+                $param->format = $format;
+                $param->required = $required;
+                $param->minimum = $minimum;
+                $param->maximum = $maximum;
+                $param->enum = $enum;
+                try{
+                    if($param->save()){
+                        $results = array(
+                            'success' => true,
+                            'status' => 200,
+                            'count' => 1,
+                            'data' => $param->toArray(),
+                        );
+                    } else {
+                        $results = array(
+                            'success' => false,
+                            'status' => 500,
+                            'errors' => Utils::modelErrorsAsArray($param->getErrors()),
+                        );
+                    }
+                } catch (\Exception $e){
+                    $results = array(
+                        'success' => false,
+                        'status' => 500,
+                        'errors' => Utils::modelErrorsAsArray($param->getErrors()),
+                    );
+                }
+                
+                $this->returnJson($results,$results['status']);
+            }
         } else {
             $e = new \Exception('Invalid request method', 405);
             $this->returnError($e, 405);

@@ -46,6 +46,33 @@ class ApiParameter extends ApiParameterBase
         return CJSON::encode($this->toArray());
     }
     
+    public function toSwagger()
+    {
+        $param = array(
+            'paramType' => $this->paramType,
+            'name' => $this->name,
+            'description' => $this->description,
+            'dataType' => $this->dataType,
+            'format' => $this->format,
+            'required' => $this->required,
+        );
+        
+        if(!is_null($this->minimum)){
+            $param['minimum'] = $this->minimum;
+        }
+        if(!is_null($this->maximum)){
+            $param['maximum'] = $this->maximum;
+        }
+        if(!is_null($this->minimum)){
+            $param['minimum'] = $this->minimum;
+        }
+        if(!is_null($this->enum)){
+            $param['enum'] = $this->enum;
+        }
+        
+        return $param;
+    }
+    
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!

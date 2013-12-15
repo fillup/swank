@@ -37,7 +37,7 @@ class Application extends ApplicationBase
     
     public function toArray()
     {
-        $api = array(
+        $app = array(
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
@@ -46,14 +46,37 @@ class Application extends ApplicationBase
             'api_version' => $this->api_version,
             'created' => $this->created,
             'updated' => $this->updated,
+            'apis' => array(),
         );
         
-        return $api;
+        foreach($this->apis as $api){
+            $app['apis'][] = $api->toArray();
+        }
+        
+        return $app;
     }
     
     public function toJson()
     {   
         return CJSON::encode($this->toArray());
+    }
+    
+    public function toSwagger()
+    {
+        $app = array(
+            'apiVersion' => $this->api_version,
+            'swaggerVersion' => '1.2',
+            'basePath' => $this->base_path,
+            'resourcePath' => $this->resource_path,
+            'apis' => array(),
+            'models' => array(),
+        );
+        
+        foreach($this->apis as $api){
+            $app['apis'][] = $api->toSwagger();
+        }
+        
+        return $app;
     }
     
     /**

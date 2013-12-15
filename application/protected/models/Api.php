@@ -38,7 +38,12 @@ class Api extends ApiBase
             'description' => $this->description,
             'created' => $this->created,
             'updated' => $this->updated,
+            'operations' => array(),
         );
+        
+        foreach($this->apiOperations as $operation){
+            $api['operations'][] = $operation->toArray();
+        }
         
         return $api;
     }
@@ -46,6 +51,21 @@ class Api extends ApiBase
     public function toJson()
     {   
         return CJSON::encode($this->toArray());
+    }
+    
+    public function toSwagger()
+    {
+        $api = array(
+            'path' => $this->path,
+            'description' => $this->description,
+            'operations' => array(),
+        );
+        
+        foreach($this->apiOperations as $op){
+            $api['operations'][] = $op->toSwagger();
+        }
+        
+        return $api;
     }
     
     /**
