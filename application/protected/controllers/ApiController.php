@@ -767,28 +767,6 @@ class ApiController extends Controller
         }
         
     }
-
-    public function returnJson($data, $status = 200)
-    {
-        // Set the content type header.
-        header('Content-type: applicaton/json', true, $status);
-
-        // Output the JSON data.
-        echo json_encode($data);
-
-        Yii::app()->end();
-    }
-
-    public function returnError($error, $status = 400)
-    {
-        $data = array(
-            'success' => 'false',
-            'error' => $error->getMessage(),
-            'code' => $error->getCode(),
-        );
-
-        $this->returnJson($data, $status);
-    }
     
     public function filterValidateApiToken($filterChain)
     {
@@ -799,7 +777,11 @@ class ApiController extends Controller
         if($api_token){
             $user = User::model()->findByAttributes(array('api_token' => $api_token));
         } else {
-            $user = false;
+            if(!Yii::app()->user->isGuest){
+                $user = Yii::app()->user->user;
+            } else {
+                $user = false;
+            }
         }
         if(!$user){
             $e = new \Exception('Invalid API Token',403);

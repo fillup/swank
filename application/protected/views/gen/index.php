@@ -1,84 +1,5 @@
 <script type="text/javascript">
-    var application_id = null;
-
-    $(function() {
-        if (application_id !== null) {
-            $('#buttonUpdateApplication').html('Update Application');
-        }
-    });
-
-    function updateApplication()
-    {
-        // Clear errors
-        $('.has-error').removeClass('has-error');
-        hideAlert('applicationError');
-        hideAlert('applicationSuccess');
-
-        var application_name = $('#inputApplicationName').val();
-        var application_desc = $('#inputApplicationDescription').val();
-        var api_version = $('#inputApiVersion').val();
-        var base_path = $('#inputBasePath').val();
-        var resource_path = $('#inputResourcePath').val();
-
-        if (application_name.length < 2) {
-            $('#divApplicationName').addClass('has-error');
-            showAlert('applicationError', 'Applicaton name is required.');
-        } else if (api_version.length < 1) {
-            $('#divApiVersion').addClass('has-error');
-            showAlert('applicationError', 'API Version is required.');
-        } else if (base_path.length < 8) {
-            $('#divBasePath').addClass('has-error');
-            showAlert('applicationError', 'Base Path must be a URL.');
-        } else if (resource_path.length < 1) {
-            $('#divResourcePath').addClass('has-error');
-            showAlert('applicationError', 'Resource Path is required.');
-        } else {
-            // Set default method and url
-            var method = 'POST';
-            var url = '/api/application';
-            // Update method and url if this is an existing application
-            if (application_id !== null) {
-                method = 'PUT';
-                url += '/' + application_id;
-            }
-
-            $.ajax({
-                url: url,
-                type: method,
-                data: {
-                    name: application_name,
-                    description: application_desc,
-                    api_version: api_version,
-                    base_path: base_path,
-                    resource_path: resource_path
-                },
-                success: function(response) {
-                    console.log(response);
-                    if (response.success === true) {
-                        application_id = response.application_id;
-                        $('#buttonUpdateApplication').html('Update Application');
-                        $('#applicationNameTitle').html(' - ' + application_name);
-                        showAlert('applicationSuccess', 'Application created successfuly, you may now add APIs to your application.');
-                    } else {
-                        showAlert('applicationError', '[' + response.code + '] ' + response.error);
-                    }
-                }
-            });
-        }
-
-        return false;
-    }
-
-    function showAlert(id, msg)
-    {
-        $('#' + id + 'Msg').empty().append(msg);
-        $('#' + id).fadeIn('slow');
-    }
-
-    function hideAlert(id)
-    {
-        $('#' + id).hide();
-    }
+    var application_id = <?php if(!is_null($application->id)){ echo '"'.$application->id.'"'; } else { echo 'null'; } ?>
 </script>
 <div class="page-header">
     <h1>Swagger Code Generator <small>Create &amp; Define your API</small></h1>
@@ -104,36 +25,59 @@
                     <div class="form-group" id="divApplicationName">
                         <label for="inputApplicationName" class="col-lg-2 control-label">Application Name</label>
                         <div class="col-lg-4">
-                            <input type="text" class="form-control" name="applicationName" id="inputApplicationName" placeholder="My Dope App">
+                            <input type="text" class="form-control" 
+                                   name="applicationName" id="inputApplicationName" 
+                                   placeholder="My Dope App"
+                                   value="<?php if(!is_null($application->name)){ echo CHtml::encode($application->name); } ?>">
                         </div>
                     </div>
                     <div class="form-group" id="divApplicationDescription">
                         <label for="inputApplicationDescription" class="col-lg-2 control-label">Description</label>
                         <div class="col-lg-8">
-                            <textarea name="applicationDescription" id="inputApplicationDescription" class="form-control" rows="3" placeholder="This field is not part of the Swagger specification and is only used within Swank"></textarea>
+                            <textarea name="applicationDescription" 
+                                      id="inputApplicationDescription" 
+                                      class="form-control" rows="3" 
+                                      placeholder="This field is not part of the Swagger specification and is only used within Swank"><?php if(!is_null($application->description)){ echo CHtml::encode($application->description); } ?></textarea>
                         </div>
                     </div>
                     <div class="form-group" id="divApiVersion">
                         <label for="inputApiVersion" class="col-lg-2 control-label">API Version</label>
                         <div class="col-lg-2">
-                            <input type="text" class="form-control" name="apiVersion" id="inputApiVersion" placeholder="1.0">
+                            <input type="text" class="form-control" 
+                                   name="apiVersion" id="inputApiVersion" 
+                                   placeholder="1.0"
+                                   value="<?php if(!is_null($application->api_version)){ echo CHtml::encode($application->api_version); } ?>">
                         </div>
                     </div>
                     <div class="form-group" id="divBasePath">
                         <label for="inputBasePath" class="col-lg-2 control-label">Base Path</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" name="basePath" id="inputBasePath" placeholder="https://mydomain.com/api">
+                            <input type="text" class="form-control" name="basePath" 
+                                   id="inputBasePath" 
+                                   placeholder="https://mydomain.com/api"
+                                   value="<?php if(!is_null($application->base_path)){ echo CHtml::encode($application->base_path); } ?>">
                         </div>
                     </div>
                     <div class="form-group" id="divResourcePath">
                         <label for="inputResourcePath" class="col-lg-2 control-label">Resource Path</label>
                         <div class="col-lg-4">
-                            <input type="text" class="form-control" name="resourcePath" id="inputResourcePath" placeholder="/person">
+                            <input type="text" class="form-control" name="resourcePath" 
+                                   id="inputResourcePath" placeholder="/person"
+                                   value="<?php if(!is_null($application->resource_path)){ echo CHtml::encode($application->resource_path); } ?>">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
-                            <button type="submit" id="buttonUpdateApplication" class="btn btn-primary">Create Application</button>
+                            <button type="submit" id="buttonUpdateApplication" 
+                                    class="btn btn-primary">
+                                <?php
+                                    if(!is_null($application->id)){
+                                        echo 'Update Application';
+                                    } else {
+                                        echo "Create Application";
+                                    }
+                                ?>
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -141,11 +85,15 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-default" id="addApisPanel" style="display: none;">
         <div class="panel-heading">
             <h4 class="panel-title">
                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
-                    2) Add APIs
+                    2) Define APIs
+                </a>
+                <a class="btn btn-primary btn-xs pull-right" style="color: white;" 
+                   href="javascript: showModal('NEW','<?php echo Yii::app()->createUrl('/gen/getEditApiForm',array('application_id' => $application->id)); ?>')" id="addApiButton">
+                    <span class="glyphicon glyphicon-plus"></span> Add API
                 </a>
             </h4>
         </div>
@@ -162,19 +110,19 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="panel panel-info">
-                            <div class="panel-heading">APIs</div>
-                            <ul class="nav nav-pills nav-stacked" id="yw4">
-                                <li><a href="#application">Define Application</a></li>
-                                <li><a href="#apis">Define APIs</a></li>
-                                <li><a href="#operations">Define Operations</a></li>
-                                <li><a href="#Parameters">Define Parameters</a></li>
-                                <li><a href="#responses">Define Responses</a></li>
+                            <div class="panel-heading">
+                                APIs
+                                <a class="btn btn-primary btn-xs pull-right" style="color: white;" 
+                                   href="javascript: showModal('NEW','<?php echo Yii::app()->createUrl('/gen/getEditApiForm',array('application_id' => $application->id)); ?>')" id="addApiButton">
+                                     <span class="glyphicon glyphicon-plus"></span> Add API
+                                </a>
+                            </div>
+                            <ul class="nav nav-pills nav-stacked" id="apiListMenu">
                             </ul>                        
                         </div>
                     </div>
-                    <div class="col-md-9">
-                        <h3>Add New API</h3>
-                        
+                    <div class="col-md-9" id="editApiContainer">
+                        <?php //echo $this->actionGetEditApiForm(); ?>
                     </div>
                 </div>
 
