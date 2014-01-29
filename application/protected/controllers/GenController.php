@@ -64,4 +64,82 @@ class GenController extends Controller {
         
         echo $modal;
     }
+    
+    public function actionGetEditOperationForm($id=false)
+    {
+        $this->layout = '';
+        $found = false;
+        
+        $api_id = Yii::app()->request->getParam('api_id',false);
+        
+        $title = "Create Operation";
+        if($id){
+            $operation = ApiOperation::model()->findByPk($id);
+            if($operation && $operation->api->application->user_id == Yii::app()->user->getId()){
+                $found = $operation;
+                $title = "Update Operation";
+                $api_id = $operation->api_id;
+            }
+        } else {
+            $id = 'NEW';
+        }
+        if(!$found){
+            $found = new ApiOperation();
+            $found->api_id = $api_id;
+        }
+        
+        $form = $this->renderPartial('/partials/operation-form',array(
+            'operation' => $found,
+            'id' => $id,
+        ),true);
+        
+        $modal = $this->renderPartial('/partials/modal',array(
+            'id' => $id,
+            'title' => $title,
+            'body' => $form,
+            'saveable' => true,
+            'saveAction' => "updateOperation('$id')",
+        ),true);
+        
+        echo $modal;
+    }
+    
+    public function actionGetEditParameterForm($id=false)
+    {
+        $this->layout = '';
+        $found = false;
+        
+        $operation_id = Yii::app()->request->getParam('operation_id',false);
+        
+        $title = "Create Parameter";
+        if($id){
+            $parameter = ApiParameter::model()->findByPk($id);
+            if($parameter && $parameter->operation->api->application->user_id == Yii::app()->user->getId()){
+                $found = $parameter;
+                $title = "Update Parameter";
+                $operation_id = $parameter->operation_id;
+            }
+        } else {
+            $id = 'NEW';
+        }
+        if(!$found){
+            $found = new ApiParameter();
+            $found->operation_id = $operation_id;
+        }
+        
+        $form = $this->renderPartial('/partials/parameter-form',array(
+            'parameter' => $found,
+            'id' => $id,
+        ),true);
+        
+        $modal = $this->renderPartial('/partials/modal',array(
+            'id' => $id,
+            'title' => $title,
+            'body' => $form,
+            'saveable' => true,
+            'saveAction' => "updateParameter('$id')",
+        ),true);
+        
+        echo $modal;
+    }
 }

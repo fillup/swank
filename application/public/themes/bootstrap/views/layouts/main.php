@@ -20,6 +20,7 @@ $cs->scriptMap["jquery.ba-bbq.js"] = Yii::app()->theme->baseUrl . "/assets/js/jq
 $cs->registerCoreScript('jquery');
 $cs->registerScriptFile("//netdna.bootstrapcdn.com/bootstrap/$bootstrapVersion/js/bootstrap.min.js", CClientScript::POS_END);
 $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClientScript::POS_END);
+$cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_END);
 $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS_END);
 
 ?>

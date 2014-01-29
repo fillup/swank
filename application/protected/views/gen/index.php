@@ -1,5 +1,6 @@
 <script type="text/javascript">
-    var application_id = <?php if(!is_null($application->id)){ echo '"'.$application->id.'"'; } else { echo 'null'; } ?>
+    var application_id = <?php if(!is_null($application->id)){ echo '"'.$application->id.'"'; } else { echo 'null'; } ?>;
+    var api_id = null;
 </script>
 <div class="page-header">
     <h1>Swagger Code Generator <small>Create &amp; Define your API</small></h1>
@@ -13,7 +14,7 @@
                 </a>
             </h4>
         </div>
-        <div id="collapseOne" class="panel-collapse collapse in">
+        <div id="collapseOne" class="panel-collapse collapse <?php if(is_null($application->id)){ echo 'in'; } ?>">
             <div class="panel-body" id="divApplicationForm">
                 <div class="alert alert-danger" id="applicationError" style="display: none;">
                     <strong>doh!</strong> <span id="applicationErrorMsg"></span>
@@ -91,13 +92,9 @@
                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
                     2) Define APIs
                 </a>
-                <a class="btn btn-primary btn-xs pull-right" style="color: white;" 
-                   href="javascript: showModal('NEW','<?php echo Yii::app()->createUrl('/gen/getEditApiForm',array('application_id' => $application->id)); ?>')" id="addApiButton">
-                    <span class="glyphicon glyphicon-plus"></span> Add API
-                </a>
             </h4>
         </div>
-        <div id="collapseTwo" class="panel-collapse collapse">
+        <div id="collapseTwo" class="panel-collapse collapse <?php if(!is_null($application->id)){ echo 'in'; } ?>">
             <div class="panel-body" id="divApiForm">
 
                 <div class="alert alert-danger" id="apiError" style="display: none;">
@@ -106,27 +103,130 @@
                 <div class="alert alert-success" id="apiSuccess" style="display: none;">
                     <strong>w00t!</strong> <span id="apiSuccessMsg"></span>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                APIs
-                                <a class="btn btn-primary btn-xs pull-right" style="color: white;" 
-                                   href="javascript: showModal('NEW','<?php echo Yii::app()->createUrl('/gen/getEditApiForm',array('application_id' => $application->id)); ?>')" id="addApiButton">
-                                     <span class="glyphicon glyphicon-plus"></span> Add API
-                                </a>
-                            </div>
-                            <ul class="nav nav-pills nav-stacked" id="apiListMenu">
-                            </ul>                        
+                <div class='container'>
+                    <div class='row'>
+                        <div class="col-md-3">
+                            <p class='well well-sm' style='text-align: center;'>
+                                First: Add/Select an API
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class='well well-sm' style='text-align: center;'>
+                                Second: Add/Select an Operation
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class='well well-sm' style='text-align: center;'>
+                                Finally: Define parameters and responses
+                            </p>
                         </div>
                     </div>
-                    <div class="col-md-9" id="editApiContainer">
-                        <?php //echo $this->actionGetEditApiForm(); ?>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">APIs</div>
+                                <div id='apiListTablePlaceholder'></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">Operations</div>
+                                <div id='operationsListTablePlaceholder'>
+                                    <p style='text-align: center;'><i>(Select an API)</i></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">Parameters</div>
+                                <div id='parametersListTablePlaceholder'>
+                                    <p style='text-align: center;'><i>(Select an Operation)</i></p>
+                                </div>                      
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">Responses</div>
+                                <div id='responsesListTablePlaceholder'>
+                                    <p style='text-align: center;'><i>(Select an Operation)</i></p>
+                                </div>                        
+                            </div>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+<script id="apiListTableTemplate" type="text/x-handlebars-template">
+    <table class="table table-borderless table-hover table-striped table-responsive" style="width: 100%">
+      <tbody>
+      {{#each data}}
+        <tr>
+          <td style='width: 20px;'>
+            <a class='nohreflink' href="javascript: showModal('{{this.id}}','/gen/getEditApiForm/{{this.id}}')">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+          </td>
+          <td class='nohreflink apiListItem' id='{{this.id}}'>
+                {{this.path}}
+                <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+    <p style="text-align: center; padding: 0px 15px 15px 15px; margin: 0;">
+      <a class='addApiButton btn btn-primary btn-xs' 
+      href='javascript: showModal("NEW","<?php echo Yii::app()->createUrl('/gen/getEditApiForm',array('application_id' => $application->id)); ?>")'>
+        <span class="glyphicon glyphicon-plus"></span> Add API
+      <a>
+    </p>
+</script>
+<script id="operationsListTableTemplate" type="text/x-handlebars-template">
+    <table class="table table-borderless table-hover table-striped table-responsive" style="width: 100%">
+      <tbody>
+      {{#each data}}
+        <tr>
+          <td style='width: 20px;'>
+            <a class='nohreflink' href="javascript: showModal('{{this.id}}','/gen/getEditOperationForm/{{this.id}}')">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
+          </td>
+          <td class='nohreflink operationListItem' id='{{this.id}}'>
+                {{this.nickname}}
+                <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+    <p style="text-align: center; padding: 0px 15px 15px 15px; margin: 0;">
+      <a class='addApiButton btn btn-primary btn-xs' 
+      href="javascript: showModal('NEW','/gen/getEditOperationForm?api_id='+api_id)">
+        <span class="glyphicon glyphicon-plus"></span> Add Operation
+      <a>
+    </p>
+</script>
+<script id="parametersListTableTemplate" type="text/x-handlebars-template">
+    <table class="table table-borderless table-hover table-striped table-responsive" style="width: 100%">
+      <tbody>
+      {{#each data}}
+        <tr class='nohreflink parameterListItem' id='{{this.id}}'>
+          <td style='width: 20px;'>
+            <span class="glyphicon glyphicon-pencil"></span>
+          </td>
+          <td>
+                {{this.name}}
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+    <p style="text-align: center; padding: 0px 15px 15px 15px; margin: 0;">
+      <a class='addParameterButton btn btn-primary btn-xs' 
+      href="javascript: showModal('NEW','/gen/getEditParameterForm?operation_id='+operation_id)">
+        <span class="glyphicon glyphicon-plus"></span> Add Parameter
+      <a>
+    </p>
+</script>

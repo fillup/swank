@@ -227,3 +227,8 @@ div.search-form
 {
 	background: #80CFFF;
 }
+
+a.api-list-item:hover
+{
+    cursor: pointer;
+}

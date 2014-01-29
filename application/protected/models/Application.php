@@ -67,10 +67,13 @@ class Application extends ApplicationBase
             'apiVersion' => $this->api_version,
             'swaggerVersion' => '1.2',
             'basePath' => $this->base_path,
-            'resourcePath' => $this->resource_path,
             'apis' => array(),
             'models' => array(),
         );
+        
+        if(!is_null($this->resource_path)){
+            $app['resourcePath'] = $this->resource_path;
+        }
         
         foreach($this->apis as $api){
             $app['apis'][] = $api->toSwagger();

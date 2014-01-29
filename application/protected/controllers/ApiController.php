@@ -635,10 +635,12 @@ class ApiController extends Controller
                 $e = new \Exception('A valid data type is required ('
                         . implode(',', array_keys($this->validDataTypes)).').',400);
                 $this->returnError($e);
-            } elseif(!$format){
-                $e = new \Exception('Format is required.',400);
-                $this->returnError($e);
-            } else {
+            } 
+//            elseif(!$format){
+//                $e = new \Exception('Format is required.',400);
+//                $this->returnError($e);
+//            } 
+            else {
                 /**
                  * Make sure an API operation with this method doesnt already
                  * exist.
@@ -664,12 +666,12 @@ class ApiController extends Controller
                     $enum = implode(',', $enum);
                 }
                 // Check that format is valid for dataType
-                if(!in_array($format,$this->validDataTypes[$dataType])){
-                    $e = new \Exception('A valid format is required for dataType '
-                            .CHtml::encode($dataType).': '
-                            .array_values($this->validDataTypes[$dataType]),400);
-                    $this->returnError($e);
-                }
+//                if(!in_array($format,$this->validDataTypes[$dataType])){
+//                    $e = new \Exception('A valid format is required for dataType '
+//                            .CHtml::encode($dataType).': '
+//                            .array_values($this->validDataTypes[$dataType]),400);
+//                    $this->returnError($e);
+//                }
                 
                 /**
                  * Create new Api Parameter record

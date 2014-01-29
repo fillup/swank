@@ -3,6 +3,26 @@
 class ApiParameter extends ApiParameterBase
 {
     
+    public $primativeDataTypes = array(
+        'integer','number','string','boolean','date','date-time'
+    );
+    
+    public $validParamTypes = array(
+        'path' => array(
+            'integer','number','string','boolean','date','date-time'
+        ),
+        'query' => array(
+            'integer','number','string','boolean','date','date-time'
+        ),
+        //'body',
+        'header' => array(
+            'integer','number','string','boolean','date','date-time'
+        ),
+        'form' => array(
+            'integer','number','string','boolean','date','date-time'
+        ),
+    );
+    
     public function rules() {
         $rules = parent::rules();
         $newRules = array_merge($rules, array(
@@ -53,7 +73,7 @@ class ApiParameter extends ApiParameterBase
             'name' => $this->name,
             'description' => $this->description,
             'dataType' => $this->dataType,
-            'format' => $this->format,
+            //'format' => $this->format,
             'required' => $this->required,
         );
         

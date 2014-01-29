@@ -1,12 +1,29 @@
 /**
+ * Global variables for handlebars templates
+ */
+var apiListTableTemplate, operationsListTableTemplate, parametersListTableTemplate;
+var responsesListTableTemplate;
+
+/**
  * On page load activities
  */
 $(function(){
     if (application_id !== null) {
         $('#buttonUpdateApplication').html('Update Application');
-        loadApiListMenu();
+        //loadApiListMenu();
         $('#addApisPanel').show();
     }
+    
+    $('#addApiOperationButton').click(function(){
+        if(api_id == null){
+            showAlert('apiError','You must select an API first.');
+        }
+    });
+    
+    /**
+     * If application_id is set, load list of APIs
+     */
+    loadApiListMenu();
 });
 
 
@@ -126,28 +143,212 @@ function updateApi(id)
 }
 
 /**
+ * Create/Update an Operation
+ */
+function updateOperation(id)
+{
+    var formId = '#formUpdateOperation-'+id;
+    var operationMethod = $((formId+' [name=operationMethod]')).val();
+    var nickname = $((formId+' [name=nickname]')).val();
+    var type = $((formId+' [name=type]')).val();
+    var summary = $((formId+' [name=summary]')).val();
+    var api_id = $((formId+' [name=api_id]')).val();
+    
+    if(nickname.length < 1){
+        showModalAlert(id,false,'A nickname is required');
+        return false;
+    } else if (summary.length < 1){
+        showModalAlert(id,false,'A summary is required');
+        return false;
+    } else {
+        // Set default method and url
+        var method = 'POST';
+        var url = '/api/apiOperation';
+        // Update method and url if this is an existing application
+        if (id !== 'NEW') {
+            method = 'PUT';
+            url += '/' + id;
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: {
+                method: operationMethod,
+                nickname: nickname,
+                type: type,
+                summary: summary,
+                api_id: api_id
+            },
+            success: function(response) {
+                console.log(response);
+                if (response.success === true) {
+                    showModalAlert(id,true,'Operation updated successfuly, you may now add parameters and responses to this Operation.');
+                    loadOperationListMenu(api_id);
+                } else {
+                    showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+                }
+            }
+        });
+    }
+    
+    return false;
+}
+
+/**
+ * Create/Update a Parameter
+ */
+function updateParameter(id)
+{
+    var formId = '#formUpdateParameter-'+id;
+    var name = $((formId+' [name=name]')).val();
+    var paramType = $((formId+' [name=paramType]')).val();
+    var dataType = $((formId+' [name=dataType]')).val();
+    var description = $((formId+' [name=description]')).val();
+    var required = $((formId+' [name=required]')).val();
+    var operation_id = $((formId+' [name=operation_id]')).val();
+    
+    if(name.length < 1){
+        showModalAlert(id,false,'A name is required');
+        return false;
+    } else if (required.length < 1){
+        showModalAlert(id,false,'You must select whether or not the parameter is required');
+        return false;
+    } else {
+        // Set default method and url
+        var method = 'POST';
+        var url = '/index-test.php/api/apiParameter';
+        // Update method and url if this is an existing application
+        if (id !== 'NEW') {
+            method = 'PUT';
+            url += '/' + id;
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: {
+                name: name,
+                paramType: paramType,
+                dataType: dataType,
+                required: required,
+                description: description,
+                operation_id: operation_id
+            },
+            success: function(response) {
+                console.log(response);
+                if (response.success === true) {
+                    showModalAlert(id,true,'Parameter updated successfuly.');
+                    loadParameterListMenu(operation_id);
+                } else {
+                    showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+                }
+            }
+        });
+    }
+    
+    return false;
+}
+
+/**
  * Loads list of defined APIs for application into left menu under Add APIs 
  * section
  */
 function loadApiListMenu()
 {
     if(application_id !== null){
-        var url = '/api/api?application_id='+application_id;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function(response){
-                console.log(response);
-                if(response.success == true){
-                    $('#apiListMenu').empty();
-                    for(i=0;i<response.count;i++){
-                        var item = '<li>';
-                        item += '<a href="">'+response.data[i].path+'</a>';
-                        item += '</li>';
-                        $('#apiListMenu').append(item);
-                    }
-                }
-            }
+        var source   = $("#apiListTableTemplate").html();
+        apiListTableTemplate = Handlebars.compile(source);
+        if(application_id !== null) {
+            $.getJSON('/api/api?application_id='+application_id,
+            function(apis){
+                console.log(apis.data);
+                $("#apiListTablePlaceholder").html(apiListTableTemplate(apis));
+                /**
+                 * Add onClick action for APIs in the list to load
+                 * the operations menu
+                 */
+                $('.apiListItem').click(function(){
+                   api_id = this.id;
+                   loadOperationListMenu(this.id);
+                   setRowActiveForTdId(this.id);
+                });
+            });
+        }
+    }
+}
+
+/**
+ * Loads list of defined Operations for a given API
+ */
+function loadOperationListMenu(api_id)
+{
+    if(api_id !== null){
+        var source   = $("#operationsListTableTemplate").html();
+        operationsListTableTemplate = Handlebars.compile(source);
+        var url = '/api/apiOperation?api_id='+api_id;
+        $.getJSON(url, function(operations){
+            console.log(operations.data);
+            $("#operationsListTablePlaceholder").html(operationsListTableTemplate(operations));
+            /**
+             * Add onClick action for Operations in the list to load
+             * the parameters and responses
+             */
+            $('.operationListItem').click(function(){
+               operation_id = this.id;
+               loadParameterListMenu(this.id);
+               //loadResponseListMenu(this.id);
+               setRowActiveForTdId(this.id);
+            });
+        });
+    }
+}
+
+/**
+ * Loads list of defined Parameters for a given Operation
+ */
+function loadParameterListMenu(operation_id)
+{
+    if(operation_id !== null){
+        var source   = $("#parametersListTableTemplate").html();
+        parametersListTableTemplate = Handlebars.compile(source);
+        var url = '/api/apiParameter?operation_id='+operation_id;
+        $.getJSON(url, function(parameters){
+            console.log(parameters.data);
+            $("#parametersListTablePlaceholder").html(parametersListTableTemplate(parameters));
+            /**
+             * Add onClick action for Parameters in the list to load
+             * the edit modal
+             */
+            $('.parameterListItem').click(function(){
+               parameter_id = this.id;
+               setRowActiveForTdId(this.id);
+               showModal(this.id,'/gen/getEditParameterForm/'+this.id);
+            });
+        });
+    }
+}
+
+/**
+ * Loads list of defined Operations for a given API
+ */
+function loadResponseListMenu(operation_id)
+{
+    if(operation_id !== null){
+        var source   = $("#responsesListTableTemplate").html();
+        responsesListTableTemplate = Handlebars.compile(source);
+        var url = '/api/apiResponse?operation_id='+operation_id;
+        $.getJSON(url, function(responses){
+            console.log(responses.data);
+            $("#responsesListTablePlaceholder").html(responsesListTableTemplate(operations));
+            /**
+             * Add onClick action for APIs in the list to load
+             * the operations menu
+             */
+            $('.responseListItem').click(function(){
+               response_id = this.id;
+               setRowActiveForTdId(this.id);
+            });
         });
     }
 }
@@ -193,4 +394,12 @@ function showModal(id,url){
         $('body').append(response);
         $(modalDivId).modal('toggle');
     });
+}
+
+function setRowActiveForTdId(id)
+{
+    $('#'+id).parent().parent().children().removeClass('success')
+    if(id){
+        $('#'+id).parent().addClass('success');
+    }
 }

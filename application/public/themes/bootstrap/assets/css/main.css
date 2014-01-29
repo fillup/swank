@@ -223,3 +223,8 @@ div.flash-success a
 {
     color:#264409;
 }
+
+.nohreflink:hover
+{
+    cursor: pointer;
+}

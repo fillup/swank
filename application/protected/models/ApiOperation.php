@@ -3,6 +3,10 @@
 class ApiOperation extends ApiOperationBase
 {
     
+    public $validTypes = array(
+        'void','array','integer','number','string','boolean','date','date-time'
+    );
+    
     public function rules() {
         $rules = parent::rules();
         $newRules = array_merge($rules, array(
