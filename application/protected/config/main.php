@@ -22,6 +22,10 @@ return array(
     ),
     // application components
     'components' => array(
+        'assetManager' => array(
+            'newFileMode' => 0777,
+            'newDirMode' => 0777,
+        ),
         'user' => array(
             // enable cookie-based authentication
             'allowAutoLogin' => true,

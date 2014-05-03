@@ -5,7 +5,7 @@ class AuthController extends Controller
     public function actionLogin()
     {
         $identity = new GitHubUserIdentity();
-        $this->redirect($identity->getLoginUrl());
+        $this->redirect($identity->getLoginUrl(Yii::app()->user->returnUrl));
     }
     
     public function actionLogout()
@@ -29,7 +29,9 @@ class AuthController extends Controller
             if($identity->authenticate()){
                 Yii::app()->user->login($identity);
                 $url = isset(Yii::app()->session['login_redirect']) ? 
-                        Yii::app()->session['login_redirect'] : '/';
+                        Yii::app()->session['login_redirect'] : 
+                       isset(Yii::app()->user->returnUrl) ? 
+                        Yii::app()->user->returnUrl : '/';
                 unset(Yii::app()->session['login_redirect']);
                 $this->redirect($url);
             } else {
