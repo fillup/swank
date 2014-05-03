@@ -23,7 +23,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
             'buttons' => array(
                 'view' => array(
                     'label' => 'View Swagger UI',
-                    'url' => 'Yii::app()->createUrl("swagger/$data->id")',
+                    'url' => 'Yii::app()->createUrl("ui/$data->id")',
                 ),
                 'update' => array(
                     'label' => 'Edit API Definition',

@@ -8,7 +8,7 @@ var responsesListTableTemplate;
  * On page load activities
  */
 $(function(){
-    if (application_id !== null) {
+    if (typeof application_id !== 'undefined' && application_id !== null) {
         $('#buttonUpdateApplication').html('Update Application');
         //loadApiListMenu();
         $('#addApisPanel').show();
@@ -256,7 +256,7 @@ function updateParameter(id)
  */
 function loadApiListMenu()
 {
-    if(application_id !== null){
+    if(typeof application_id !== 'undefined' && application_id !== null){
         var source   = $("#apiListTableTemplate").html();
         apiListTableTemplate = Handlebars.compile(source);
         if(application_id !== null) {
