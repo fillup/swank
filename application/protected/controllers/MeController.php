@@ -26,7 +26,7 @@ class MeController extends Controller
                 'order' => '`name` DESC',
             ),
             'pagination' => array(
-                'pageSize' => 2,
+                'pageSize' => 20,
             ),
         ));
         $this->render('index', array(

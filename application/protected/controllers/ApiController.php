@@ -521,8 +521,8 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to update api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),500);
-                $this->returnError($e,500);
+                $e = new \Exception("Unable to update api operation: ".Utils::modelErrorsAsHtml($operation->getErrors()),400);
+                $this->returnError($e,400);
             }
         } elseif($req->isDeleteRequest) {
             if(!$id){
@@ -536,7 +536,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),500);
+                $e = new \Exception("Unable to delete api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),400);
                 $this->returnError($e);
             }
         } else {

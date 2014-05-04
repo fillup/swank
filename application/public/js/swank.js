@@ -8,7 +8,7 @@ var responsesListTableTemplate;
  * On page load activities
  */
 $(function(){
-    if (application_id !== null) {
+    if (typeof application_id !== 'undefined' && application_id !== null) {
         $('#buttonUpdateApplication').html('Update Application');
         //loadApiListMenu();
         $('#addApisPanel').show();
@@ -86,6 +86,10 @@ function updateApplication()
                 } else {
                     showAlert('applicationError', '[' + response.code + '] ' + response.error);
                 }
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showAlert('applicationError', '[' + response.code + '] ' + response.error);
             }
         });
     }
@@ -135,6 +139,10 @@ function updateApi(id)
                 } else {
                     showModalAlert(id,false,'[' + response.code + '] ' + response.error);
                 }
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
             }
         });
     }
@@ -182,12 +190,16 @@ function updateOperation(id)
             },
             success: function(response) {
                 console.log(response);
-                if (response.success === true) {
+                if (response.success === true || response.success === 'true') {
                     showModalAlert(id,true,'Operation updated successfuly, you may now add parameters and responses to this Operation.');
                     loadOperationListMenu(api_id);
                 } else {
                     showModalAlert(id,false,'[' + response.code + '] ' + response.error);
                 }
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
             }
         });
     }
@@ -243,6 +255,10 @@ function updateParameter(id)
                 } else {
                     showModalAlert(id,false,'[' + response.code + '] ' + response.error);
                 }
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
             }
         });
     }
@@ -256,7 +272,7 @@ function updateParameter(id)
  */
 function loadApiListMenu()
 {
-    if(application_id !== null){
+    if(typeof application_id !== 'undefined' && application_id !== null){
         var source   = $("#apiListTableTemplate").html();
         apiListTableTemplate = Handlebars.compile(source);
         if(application_id !== null) {
