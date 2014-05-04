@@ -107,7 +107,7 @@ Rand_Gen_Loop:
     public static function modelErrorsAsArray($errors)
     {
         $response = array();
-        if(is_array($errors) && count($errors) >0){
+        if(is_array($errors) && count($errors) > 0){
             foreach($errors as $field){
                 if(is_array($field)){
                     foreach($field as $error){
@@ -115,7 +115,9 @@ Rand_Gen_Loop:
                     }
                 }
             }
-        } 
+        } else {
+            $response[] = $errors;
+        }
         
         return $response;
     }

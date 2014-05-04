@@ -18,9 +18,9 @@ $cs->scriptMap["jquery.ba-bbq.js"] = Yii::app()->theme->baseUrl . "/assets/js/jq
 
 // register js files
 $cs->registerCoreScript('jquery');
-$cs->registerScriptFile("//netdna.bootstrapcdn.com/bootstrap/$bootstrapVersion/js/bootstrap.min.js", CClientScript::POS_END);
-$cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClientScript::POS_END);
-$cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_END);
+$cs->registerScriptFile("//netdna.bootstrapcdn.com/bootstrap/$bootstrapVersion/js/bootstrap.min.js", CClientScript::POS_BEGIN);
+//$cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClientScript::POS_END);
+$cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_BEGIN);
 $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS_END);
 
 ?>
@@ -64,7 +64,7 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
                         <span class="icon-bar"></span>
                     </button>
 
-                <a class="navbar-brand" href="<?php echo Yii::app()->baseUrl; ?>">Swank</a>
+                <a class="navbar-brand" href="<?php echo Yii::app()->baseUrl; ?>/">Swank</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -73,7 +73,6 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
                 <?php $this->widget('zii.widgets.CMenu',array(
                     'htmlOptions'=>array('class'=>'nav navbar-nav'),
                     'items'=>array(
-                        array('label'=>'Get Started', 'url'=>array('/gen')),
                         array('label'=>'My Apps', 'url'=>array('/me'), 'visible'=>!Yii::app()->user->isGuest),
                     ),
                 )); ?>

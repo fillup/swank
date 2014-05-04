@@ -1,5 +1,8 @@
 <div class="page-header">
     <h1>My Applications</h1>
+    <a class="btn btn-primary btn-xs" href="<?php echo Yii::app()->createUrl('/gen'); ?>">
+        <span class="glyphicon glyphicon-plus"></span> Add Application
+    </a>
 </div>
 <?php
 $this->widget('zii.widgets.grid.CGridView', array(
