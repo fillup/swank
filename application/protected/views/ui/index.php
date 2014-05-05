@@ -42,6 +42,28 @@
         window.swaggerUi.load();
     });
 </script>
+<?php
+    if($error){
+?>
+<div class="alert alert-danger" id="applicationError">
+    <strong>doh!</strong> <span id="applicationErrorMsg"><?php echo $error; ?></span>
+</div>
+<?php
+    } else {
+?>
+<h1><?php echo $appName; ?> <small>API Playground</small></h1>
+<?php
+        if($isOwner){
+?>
+<a class="btn btn-primary btn-xs"
+   style="display: inline-block; margin: 5px 0px 10px 0px"
+   href="<?php echo Yii::app()->createUrl('/gen/'.$appId); ?>">
+    <span class="glyphicon glyphicon-pencil"></span> Edit Application
+</a>
+<?php
+        }
+    }
+?>
 <div class="swagger-section">
     <div id='header'>
         <div class="swagger-ui-wrap">
