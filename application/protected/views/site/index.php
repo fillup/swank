@@ -63,7 +63,7 @@ $this->pageTitle=Yii::app()->name;
                 <ul>
                     <li><a href="https://developers.helloreverb.com/swagger/" 
                            target="_blank" title="Swagger Homepage">Swagger Homepage</a></li>
-                    <li><a href="https://github.com/wordnik/swagger-core/wiki" 
+                    <li><a href="https://github.com/wordnik/swagger-spec" 
                            target="_blank" title="Swagger Specification">Specification</a></li>
                     <li><a href="https://github.com/wordnik/swagger-core/wiki/Downloads" 
                            target="_blank" title="Swagger Downloads">Downloads</a></li>

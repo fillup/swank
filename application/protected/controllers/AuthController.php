@@ -28,10 +28,10 @@ class AuthController extends Controller
             $identity = new GitHubUserIdentity($code);
             if($identity->authenticate()){
                 Yii::app()->user->login($identity);
-                $url = isset(Yii::app()->session['login_redirect']) ? 
+                $url = isset(Yii::app()->session['login_redirect']) && Yii::app()->session['login_redirect'] != '/' ? 
                         Yii::app()->session['login_redirect'] : 
-                       isset(Yii::app()->user->returnUrl) ? 
-                        Yii::app()->user->returnUrl : '/';
+                       isset(Yii::app()->user->returnUrl) && Yii::app()->user->returnUrl != '/' ? 
+                        Yii::app()->user->returnUrl : Yii::app()->createUrl('/me');
                 unset(Yii::app()->session['login_redirect']);
                 $this->redirect($url);
             } else {

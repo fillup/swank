@@ -82,7 +82,8 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
                     'htmlOptions'=>array('class'=>'nav navbar-nav pull-right'),
                     'items'=>array(
                         array('label'=>'Fork Me', 'url'=>'http://github.com/'),
-                        array('label'=>'Login with GitHub', 'url'=>array('/auth/login'), 'visible'=>Yii::app()->user->isGuest, ),
+                        array('label'=>'Login with GitHub', 'url'=>array('/auth/login'), 
+                              'visible'=>Yii::app()->user->isGuest, ),
                         array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/auth/logout'), 'visible'=>!Yii::app()->user->isGuest)
                     ),
                 )); ?>
@@ -175,7 +176,7 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
 
         <footer>
             <p>
-                &copy; <?php echo Yii::app()->name; ?>. All Rights Reserved.<br/>
+                &copy; <?php echo date('Y',time()); ?> <?php echo Yii::app()->name; ?>. All Rights Reserved.<br/>
                 Profiling: <?php echo round(Yii::getLogger()->getExecutionTime(),2); ?>s / <?php echo round(Yii::getLogger()->getMemoryUsage()/1048576,2); ?>mb
             </p>
         </footer>

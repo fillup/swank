@@ -15,7 +15,6 @@ $this->widget('zii.widgets.grid.CGridView', array(
         ),
         'base_path',
         'resource_path',
-        'api_version',
         array(
             'name' => 'updated',
             'value' => 'date("M j, Y", strtotime($data->updated))',
