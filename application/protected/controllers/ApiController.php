@@ -31,6 +31,8 @@ class ApiController extends Controller
         'dateTime'  => array('string','date-time'),
     );
     
+    public $validVisibilityOptions = array('public','unlisted');
+    
     public function filters()
     {
         return array(
@@ -107,6 +109,7 @@ class ApiController extends Controller
             $base_path      = $req->getParam('base_path', false);
             $resource_path  = $req->getParam('resource_path', false);
             $api_version    = $req->getParam('api_version', false);
+            $visibility     = $req->getParam('visibility',false);
 
             // Clean any beginning/ending whitespace before validation
             $name           = $name ? trim($name) : $name;
@@ -114,6 +117,7 @@ class ApiController extends Controller
             $base_path      = $base_path ? trim($base_path) : $base_path;
             $resource_path  = $resource_path ? trim($resource_path) : $resource_path;
             $api_version    = $api_version ? trim($api_version) : $api_version;
+            $visibility     = $visibility ? trim($visibility) : $visibility;
             
             // This is a new Application, validate all fields
             if(!$name){
@@ -136,6 +140,7 @@ class ApiController extends Controller
                 $app->base_path = $base_path;
                 $app->resource_path = $resource_path;
                 $app->user_id = $this->_user->id;
+                $app->visibility = $visibility;
                 if($app->save()){
                     $results = array(
                         'success' => true,
@@ -145,7 +150,7 @@ class ApiController extends Controller
                     );
                     $this->returnJson($results,200);
                 } else {
-                    $e = new \Exception("Unable to create new application record: ".print_r($app->getErrors(),true),205);
+                    $e = new \Exception("Unable to create new application record: ".Utils::modelErrorsAsHtml($app->getErrors(),true),205);
                     $this->returnError($e,400);
                 }
             }
@@ -161,6 +166,7 @@ class ApiController extends Controller
             $base_path = $req->getPut('base_path', false);
             $resource_path = $req->getPut('resource_path', false);
             $api_version = $req->getPut('api_version', false);
+            $visibility = $req->getPut('visibility', false);
 
             // Clean any beginning/ending whitespace before validation
             $name = $name ? trim($name) : $name;
@@ -168,19 +174,21 @@ class ApiController extends Controller
             $base_path = $base_path ? trim($base_path) : $base_path;
             $resource_path = $resource_path ? trim($resource_path) : $resource_path;
             $api_version = $api_version ? trim($api_version) : $api_version;
+            $visibility = $visibility ? trim($visibility) : $visibility;
             
             $application->name = $name ?: $application->name;
             $application->description = $description ?: $application->description;
             $application->base_path = $base_path ?: $application->base_path;
             $application->resource_path = $resource_path ?: $application->resource_path;
             $application->api_version = $api_version ?: $application->api_version;
+            $application->visibility = $visibility ?: $application->visibility;
             if($application->save()){
                 $results = array(
                     'success' => true
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to update application: ".Utils::modelErrorsAsArray($application->getErrors()),500);
+                $e = new \Exception("Unable to update application: ".Utils::modelErrorsAsHtml($application->getErrors()),500);
                 $this->returnError($e);
             }
             
@@ -196,7 +204,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete application: ".Utils::modelErrorsAsArray($application->getErrors()),500);
+                $e = new \Exception("Unable to delete application: ".Utils::modelErrorsAsHtml($application->getErrors()),500);
                 $this->returnError($e);
             }
         } else {
@@ -331,7 +339,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to update api: ".Utils::modelErrorsAsArray($api->getErrors()),500);
+                $e = new \Exception("Unable to update api: ".Utils::modelErrorsAsHtml($api->getErrors()),500);
                 $this->returnError($e,500);
             }
         } elseif ($req->isDeleteRequest){
@@ -346,7 +354,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete api: ".Utils::modelErrorsAsArray($api->getErrors()),500);
+                $e = new \Exception("Unable to delete api: ".Utils::modelErrorsAsHtml($api->getErrors()),500);
                 $this->returnError($e);
             }
         } else {
@@ -536,7 +544,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete api operation: ".Utils::modelErrorsAsArray($operation->getErrors()),400);
+                $e = new \Exception("Unable to delete api operation: ".Utils::modelErrorsAsHtml($operation->getErrors()),400);
                 $this->returnError($e);
             }
         } else {
@@ -745,7 +753,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to update api parameter: ".Utils::modelErrorsAsArray($api_param->getErrors()),500);
+                $e = new \Exception("Unable to update api parameter: ".Utils::modelErrorsAsHtml($api_param->getErrors()),500);
                 $this->returnError($e,500);
             }
         } elseif($req->isDeleteRequest) {
@@ -760,7 +768,7 @@ class ApiController extends Controller
                 );
                 $this->returnJson($results, 200);
             } else {
-                $e = new \Exception("Unable to delete api parameter: ".Utils::modelErrorsAsArray($api_param->getErrors()),500);
+                $e = new \Exception("Unable to delete api parameter: ".Utils::modelErrorsAsHtml($api_param->getErrors()),500);
                 $this->returnError($e);
             }
         } else {

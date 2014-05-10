@@ -67,6 +67,31 @@
                                    value="<?php if(!is_null($application->resource_path)){ echo CHtml::encode($application->resource_path); } ?>">
                         </div>
                     </div>
+                    <div class="form-group" id="divVisibility">
+                        <label for="inputVisibility" class="col-lg-2 control-label">Application Visibility</label>
+                        <div class="col-lg-4" style='padding-left: 30px;'>
+                            <div class='radio'>
+                            <label>
+                                <input type='radio' name='visibility' value='public'
+                                       <?php if($application->visibility == 'public'){ echo "checked='checked'"; } ?>
+                                       /> Public
+                            </label>
+                            </div>
+                            <div class='radio'>
+                            <label>
+                                <input type='radio' name='visibility' value='unlisted'
+                                       <?php if($application->visibility == 'unlisted'){ echo "checked='checked'"; } ?>
+                                       /> Unlisted
+                            </label>
+                            </div>
+                            <span class="help-block">
+                                Publicly visible APIs will be listed in the 
+                                <a href='<?php echo Yii::app()->createUrl('/directory'); ?>'>
+                                    API Directory
+                                </a>
+                            </span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <button type="submit" id="buttonUpdateApplication" 

@@ -74,6 +74,7 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
                     'htmlOptions'=>array('class'=>'nav navbar-nav'),
                     'items'=>array(
                         array('label'=>'My Apps', 'url'=>array('/me'), 'visible'=>!Yii::app()->user->isGuest),
+                        array('label'=>'API Directory', 'url'=>array('/directory'),),
                     ),
                 )); ?>
 

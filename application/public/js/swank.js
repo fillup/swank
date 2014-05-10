@@ -43,6 +43,7 @@ function updateApplication()
     var api_version = $('#inputApiVersion').val();
     var base_path = $('#inputBasePath').val();
     var resource_path = $('#inputResourcePath').val();
+    var visibility = $('input[name=visibility]:checked').val();
 
     if (application_name.length < 2) {
         $('#divApplicationName').addClass('has-error');
@@ -74,7 +75,8 @@ function updateApplication()
                 description: application_desc,
                 api_version: api_version,
                 base_path: base_path,
-                resource_path: resource_path
+                resource_path: resource_path,
+                visibility: visibility
             },
             success: function(response) {
                 console.log(response);

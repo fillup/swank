@@ -22,7 +22,7 @@ class UiController extends Controller
         if($appName){
             $this->pageTitle = $appName.' - API Playground | '.Yii::app()->name;
         }
-        $swaggerSpecUrl = Yii::app()->createAbsoluteUrl('/api/application',array('id' => $id,'swagger' => true));
+        $swaggerSpecUrl = Yii::app()->createAbsoluteUrl('/ui/swaggerDocs',array('id' => $id));
         $this->render('index',array(
             'swaggerSpecUrl' => $swaggerSpecUrl,
             'appName' => $appName,
@@ -30,5 +30,20 @@ class UiController extends Controller
             'error' => $error,
             'appId' => $id,
         ));
+    }
+    
+    public function actionSwaggerDocs($id=false)
+    {
+        if(!$id){
+            $e = new \Exception('Application ID not found', 404);
+            $this->returnError($error,404);
+        } else {
+            $app = Application::model()->findByPk($id);
+            if(!$app){
+                $error = "Invalid Application ID provided";
+            } else {
+                $this->returnJson($app->toSwagger());
+            }
+        }
     }
 }

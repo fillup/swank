@@ -13,6 +13,7 @@
  * @property string $api_version
  * @property string $created
  * @property string $updated
+ * @property string $visibility
  *
  * The followings are the available model relations:
  * @property Api[] $apis
@@ -36,15 +37,15 @@ class ApplicationBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('user_id, name', 'required'),
+			array('user_id, name, visibility', 'required'),
 			array('id, user_id', 'length', 'max'=>32),
 			array('name, resource_path', 'length', 'max'=>64),
 			array('description, base_path', 'length', 'max'=>255),
-			array('api_version', 'length', 'max'=>16),
+			array('api_version, visibility', 'length', 'max'=>16),
 			array('created, updated', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, user_id, name, description, base_path, resource_path, api_version, created, updated', 'safe', 'on'=>'search'),
+			array('id, user_id, name, description, base_path, resource_path, api_version, created, updated, visibility', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,6 +77,7 @@ class ApplicationBase extends CActiveRecord
 			'api_version' => 'Api Version',
 			'created' => 'Created',
 			'updated' => 'Updated',
+			'visibility' => 'Visibility',
 		);
 	}
 
@@ -106,6 +108,7 @@ class ApplicationBase extends CActiveRecord
 		$criteria->compare('api_version',$this->api_version,true);
 		$criteria->compare('created',$this->created,true);
 		$criteria->compare('updated',$this->updated,true);
+		$criteria->compare('visibility',$this->visibility,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
