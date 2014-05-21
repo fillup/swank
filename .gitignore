@@ -7,3 +7,4 @@ local.php
 phpinfo.php
 *.rpm
 .vagrant/
+.idea/

@@ -85,7 +85,7 @@
                             </label>
                             </div>
                             <span class="help-block">
-                                Publicly visible APIs will be listed in the 
+                                Note: Publicly visible Aplications will be listed in the 
                                 <a href='<?php echo Yii::app()->createUrl('/directory'); ?>'>
                                     API Directory
                                 </a>

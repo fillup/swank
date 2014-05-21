@@ -75,7 +75,7 @@ class Application extends ApplicationBase
         );
         
         if(!is_null($this->resource_path)){
-            $app['resourcePath'] = $this->resource_path;
+            //$app['resourcePath'] = $this->resource_path;
         }
         
         foreach($this->apis as $api){
