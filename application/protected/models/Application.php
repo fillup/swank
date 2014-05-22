@@ -72,6 +72,7 @@ class Application extends ApplicationBase
             'basePath' => $this->base_path,
             'apis' => array(),
             'models' => array(),
+            'resourcePath' => $this->resource_path,
         );
         
         if(!is_null($this->resource_path)){
