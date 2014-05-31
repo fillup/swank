@@ -92,6 +92,33 @@
                             </span>
                         </div>
                     </div>
+                    <div class="form-group" id="divAuthorization">
+                        <label for="inputAuthorizationType" class="col-lg-2 control-label">Authorization Type</label>
+                        <div class="col-lg-4">
+                            <select class="form-control" name="authorizationType" id="inputAuthorizationType">
+                                <?php
+                                    foreach(Application::$AUTHORIZATION_TYPES as $authType){
+                                ?>
+                                        <option value="<?php echo $authType; ?>"
+                                                <?php if($application->authorization_type == $authType){ echo "selected='selected'"; } ?>>
+                                            <?php echo $authType; ?>
+                                        </option>
+                                <?php
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="divAuthorizationConfig">
+                        <?php
+                        if($application->authorization_type && $application->authorization_type != 'none'){
+                            $this->renderPartial(
+                                '/partials/authorization-configs/'.$application->authorization_type,
+                                array('application' => $application)
+                            );
+                        }
+                        ?>
+                    </div>
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <button type="submit" id="buttonUpdateApplication" 

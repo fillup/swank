@@ -2,6 +2,10 @@
 
 class Application extends ApplicationBase
 {
+
+    public static $AUTHORIZATION_TYPES = array(
+        'none','api_key',
+    );
     
     public function rules() {
         $rules = parent::rules();

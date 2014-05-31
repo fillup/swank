@@ -30,15 +30,23 @@
             },
             docExpansion: "none"
         });
-
+<?php
+    if($authorization_type == 'api_key'){
+?>
         $('#input_apiKey').change(function() {
             var key = $('#input_apiKey')[0].value;
             log("key: " + key);
             if (key && key.trim() != "") {
                 log("added key " + key);
-                window.authorizations.add("key", new ApiKeyAuthorization("api_key", key, "query"));
+                window.authorizations.add("key",
+                    new ApiKeyAuthorization("<?php echo CHtml::encode($authorization_config['param_name']); ?>",
+                        key, "<?php echo CHtml::encode($authorization_config['param_type']); ?>"));
             }
-        })
+        });
+
+<?php
+    }
+?>
         window.swaggerUi.load();
     });
 </script>
@@ -70,7 +78,13 @@
             <a id="logo" href="http://swagger.wordnik.com">swagger</a>
             <form id='api_selector'>
                 <div class='input' style="display: none;"><input type="hidden" id="input_baseUrl" name="baseUrl" type="text" value="<?php echo $swaggerSpecUrl; ?>"/></div>
-                <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
+<?php
+    if($authorization_type == 'api_key'){
+?>
+                <div class='input'><input placeholder="<?php echo CHtml::encode($authorization_config['param_name']); ?>" id="input_apiKey" name="apiKey" type="text"/></div>
+<?php
+    }
+?>
                 <div class='input'><a id="explore" href="#">Explore</a></div>
             </form>
         </div>
