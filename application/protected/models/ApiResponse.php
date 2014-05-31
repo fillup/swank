@@ -2,7 +2,10 @@
 
 class ApiResponse extends ApiResponseBase
 {
-    
+    public $primitiveDataTypes = array(
+        'integer','number','string','boolean','date','date-time'
+    );
+
     public function rules() {
         $rules = parent::rules();
         $newRules = array_merge($rules, array(
@@ -10,6 +13,12 @@ class ApiResponse extends ApiResponseBase
                  'value' => Utils::getRandStr(),
                  'setOnEmpty' => true, 'on' => 'insert'),
             array('id','unsafe'),
+            array('operation_id','match','allowEmpty' => false, 'not' => false,
+                'pattern' => '/[a-zA-Z0-9\-]{32}/', 'message' => 'Operation ID required.'),
+            array('code','match','allowEmpty' => false, 'not' => false,
+                'pattern' => '/[0-9]{3}/', 'message' => 'A valid HTTP Status code is required.'),
+            array('responseModel','in','range' => $this->primitiveDataTypes,
+                'allowEmpty' => false, 'message' => 'Response type must be one of: '.implode(', ',$this->primitiveDataTypes)),
             array('updated', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'update'),
@@ -20,10 +29,32 @@ class ApiResponse extends ApiResponseBase
         
         return $newRules;
     }
+
+    public function toArray()
+    {
+        return array(
+            'id' => $this->id,
+            'operation_id' => $this->operation_id,
+            'code' => $this->code,
+            'message' => $this->message,
+            'responseModel' => $this->responseModel,
+            'created' => $this->created,
+            'updated' => $this->updated,
+        );
+    }
+
+    public function toJson()
+    {
+        return json_encode($this->toArray());
+    }
     
     public function toSwagger()
     {
-        return array();
+        return array(
+            'code' => $this->code,
+            'message' => $this->message,
+            'responseModel' => $this->responseModel,
+        );
     }
     
     /**

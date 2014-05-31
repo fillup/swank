@@ -35,7 +35,7 @@
         <div class="col-lg-4">
             <select name='dataType' id='inputDataType' class='form-control'>
                 <?php
-                    foreach($parameter->primativeDataTypes as $type){
+                    foreach($parameter->primitiveDataTypes as $type){
                 ?>
                 <option value='<?php echo $type; ?>' <?php if($parameter->dataType == $type){ echo "selected='selected'"; } ?>>
                     <?php echo $type; ?>

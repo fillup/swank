@@ -25,7 +25,7 @@ if it enhances the product for the masses, I'll pull it in.
 ## TODO ##
  - [ ] Integrate [Yiistrap](http://www.getyiistrap.com) to simplify bootstrap styles with Yii widgets like a CGridView with a CActiveDataProvider
  - [ ] Create Public API Directory to list Applications with public status
- - [ ] Implement support for Responses as part of Operations
+ - [x] Implement support for Responses as part of Operations
  - [ ] Add support for Model/Object data types
  - [ ] Add ability to "Export" or "Download" standalone swagger-ui code
  - [x] Add ability to configure authentication type for an application, either token/key or none

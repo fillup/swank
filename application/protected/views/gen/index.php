@@ -282,3 +282,25 @@
       <a>
     </p>
 </script>
+<script id="responsesListTableTemplate" type="text/x-handlebars-template">
+    <table class="table table-borderless table-hover table-striped table-responsive" style="width: 100%">
+        <tbody>
+        {{#each data}}
+        <tr class='nohreflink responseListItem' id='{{this.id}}'>
+            <td style='width: 20px;'>
+                <span class="glyphicon glyphicon-pencil"></span>
+            </td>
+            <td>
+                {{this.code}}
+            </td>
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    <p style="text-align: center; padding: 0px 15px 15px 15px; margin: 0;">
+        <a class='addResponseButton btn btn-primary btn-xs'
+           href="javascript: showModal('NEW','/gen/getEditResponseForm?operation_id='+operation_id)">
+            <span class="glyphicon glyphicon-plus"></span> Add Response
+            <a>
+    </p>
+</script>
