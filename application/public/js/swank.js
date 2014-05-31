@@ -19,6 +19,18 @@ $(function(){
             showAlert('apiError','You must select an API first.');
         }
     });
+
+    $('#inputAuthorizationType').change(function(){
+        var authorization_type = $('#inputAuthorizationType').val();
+        if(authorization_type == 'none'){
+            $('#divAuthorizationConfig').empty();
+        } else {
+            $('#divAuthorizationConfig').load(
+                '/gen/getAuthorizationConfigForm/'+application_id+'?authorization_type='+authorization_type
+            );
+        }
+
+    });
     
     /**
      * If application_id is set, load list of APIs
@@ -44,6 +56,7 @@ function updateApplication()
     var base_path = $('#inputBasePath').val();
     var resource_path = $('#inputResourcePath').val();
     var visibility = $('input[name=visibility]:checked').val();
+    var authorization_type = $('#inputAuthorizationType').val();
 
     if (application_name.length < 2) {
         $('#divApplicationName').addClass('has-error');
@@ -57,6 +70,9 @@ function updateApplication()
     } else if (resource_path.length < 1) {
         $('#divResourcePath').addClass('has-error');
         showAlert('applicationError', 'Resource Path is required.');
+    } else if (authorization_type.length < 1){
+        $('#divAuthorization').addClass('has-error');
+        showAlert('applicationError', 'Authorization Type is required.');
     } else {
         // Set default method and url
         var method = 'POST';
@@ -65,6 +81,17 @@ function updateApplication()
         if (application_id !== null) {
             method = 'PUT';
             url += '/' + application_id;
+        }
+
+        if(authorization_type != 'none'){
+            var authorization_config = getAuthorizationConfig();
+            if(authorization_config === false){
+                $('#divAuthorization').addClass('has-error');
+                showAlert('applicationError', 'Authorization Type "'+authorization_type+'" requires additional information.');
+                return false;
+            }
+        } else {
+            var authorization_config = null;
         }
 
         $.ajax({
@@ -76,7 +103,9 @@ function updateApplication()
                 api_version: api_version,
                 base_path: base_path,
                 resource_path: resource_path,
-                visibility: visibility
+                visibility: visibility,
+                authorization_type: authorization_type,
+                authorization_config: authorization_config
             },
             success: function(response) {
                 console.log(response);

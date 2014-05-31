@@ -4,7 +4,7 @@
 sudo apt-get install -y git curl php5 php5-curl php5-mysql mysql-server
 
 # Mount synced folder as apache
-sudo mount -t vboxsf -o uid=`id -u www-data`,gid=`id -g www-data` /var/www/swank /var/www/swank
+#sudo mount -t vboxsf -o uid=`id -u www-data`,gid=`id -g www-data` /var/www/swank /var/www/swank
 
 # Make sure the timezone is set in php.ini.
 sudo sed -i".bak" "s/^\;date\.timezone.*$/date\.timezone = \"America\\/New_York\" /g" /etc/php5/apache2/php.ini

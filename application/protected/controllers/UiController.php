@@ -29,6 +29,8 @@ class UiController extends Controller
             'isOwner' => $isOwner,
             'error' => $error,
             'appId' => $id,
+            'authorization_type' => $app->authorization_type,
+            'authorization_config' => !is_array($app->authorization_config) ? json_decode($app->authorization_config,true) : $app->authorization_config,
         ));
     }
     

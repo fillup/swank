@@ -142,4 +142,31 @@ class GenController extends Controller {
         
         echo $modal;
     }
+
+    public function actionGetAuthorizationConfigForm($id=false)
+    {
+        $this->layout = '';
+        $found = false;
+        $authorization_type = Yii::app()->request->getParam('authorization_type','none');
+
+        if($authorization_type == 'none'){
+            $found = true;
+            echo '';
+        } elseif($id){
+            $application = Application::model()->findByPk($id);
+            if($application && $application->user_id == Yii::app()->user->getId()){
+                $found = true;
+                $this->renderPartial(
+                    '/partials/authorization-configs/'.$authorization_type,
+                    array(
+                        'application' => $application,
+                    )
+                );
+            }
+        }
+
+        if(!$found){
+            echo '';
+        }
+    }
 }
