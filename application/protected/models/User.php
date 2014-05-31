@@ -15,6 +15,7 @@ class User extends UserBase
             array('id','default',
                  'value' => Utils::getRandStr(),
                  'setOnEmpty' => true, 'on' => 'insert'),
+            array('id, access_token, api_token','unsafe'),
             array('last_login', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'update'),

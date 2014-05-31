@@ -13,10 +13,11 @@ class Application extends ApplicationBase
             array('id','default',
                  'value' => Utils::getRandStr(),
                  'setOnEmpty' => true, 'on' => 'insert'),
+            array('id','unsafe'),
             array('updated', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
+            array('created, updated', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'insert'),
             array('name', 'match', 'allowEmpty' => false,
@@ -24,15 +25,57 @@ class Application extends ApplicationBase
             array('base_path', 'match', 'allowEmpty' => false,
                 'not' => false, 'pattern' => '/http[s]?:\/\/(.*){1,}/'),
             array('resource_path', 'match', 'allowEmpty' => false,
-                'not' => false, 'pattern' => '/^\/[a-zA-Z0-9]{1,}.*/'),
+                'not' => false, 'pattern' => '/^\/[a-zA-Z0-9\{\}#]{1,}.*/'),
             array('visibility','in','range'=>array('public','unlisted'),
                 'allowEmpty' => false, 'message' => 'Visibility is required. '
                 . 'Valid options are: public, unlisted'),
+            array('authorization_type','in','range'=>self::$AUTHORIZATION_TYPES,
+                'allowEmpty' => false, 'message' => 'Authorization Type is required. Valid options are: '.implode(self::$AUTHORIZATION_TYPES)),
+            array('authorization_config','isJson',
+                'allowEmpty' => true, 'message' => 'Authorization Config does not appear to be valid JSON.'),
+            array('authorization_config','default',
+                'value' => null, 'setOnEmpty' => true),
         ));
         
         return $newRules;
     }
-    
+
+    /**
+     * Ensure that value is proper json if not allowed to be empty
+     * @param string $attribute the name of the attribute to be validated
+     * @param array $params options specified in the validation rule
+     */
+    public function isJson($attribute,$params)
+    {
+        if($params['allowEmpty'] === false && (is_null($this->$attribute) || $this->$attribute == '' )){
+            $this->addError($attribute,'first, '.$params['message']);
+        }
+        if(!is_null($this->$attribute) && $this->$attribute != ''){
+            if(!is_array($this->$attribute)){
+                $value = json_decode($this->$attribute,true);
+                if(!is_array($value)){
+                    $this->addError($attribute,'second, '.$params['message']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Before saving an application, make sure authorization_config is a json encoded string
+     */
+    public function beforeSave()
+    {
+        parent::beforeSave();
+        if(is_array($this->authorization_config)){
+            $this->authorization_config = json_encode($this->authorization_config);
+        }
+        return true;
+    }
+
+    /**
+     * Before deleting an application, go delete all of its APIs.
+     * @return bool
+     */
     public function beforeDelete()
     {
         parent::beforeDelete();
@@ -41,7 +84,11 @@ class Application extends ApplicationBase
         }
         return true;
     }
-    
+
+    /**
+     * Return application as an array
+     * @return array
+     */
     public function toArray()
     {
         $app = array(
@@ -53,8 +100,17 @@ class Application extends ApplicationBase
             'api_version' => $this->api_version,
             'created' => $this->created,
             'updated' => $this->updated,
+            'visibility' => $this->visibility,
+            'authorization_type' => $this->authorization_type,
             'apis' => array(),
         );
+
+        if(!is_null($this->authorization_config)){
+            $config = json_decode($this->authorization_config,true);
+            if(is_array($config)){
+                $app['authorization_config'] = $config;
+            }
+        }
         
         foreach($this->apis as $api){
             $app['apis'][] = $api->toArray();
