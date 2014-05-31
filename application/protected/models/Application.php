@@ -25,7 +25,7 @@ class Application extends ApplicationBase
             array('base_path', 'match', 'allowEmpty' => false,
                 'not' => false, 'pattern' => '/http[s]?:\/\/(.*){1,}/'),
             array('resource_path', 'match', 'allowEmpty' => false,
-                'not' => false, 'pattern' => '/^\/[a-zA-Z0-9]{1,}.*/'),
+                'not' => false, 'pattern' => '/^\/[a-zA-Z0-9\{\}#]{1,}.*/'),
             array('visibility','in','range'=>array('public','unlisted'),
                 'allowEmpty' => false, 'message' => 'Visibility is required. '
                 . 'Valid options are: public, unlisted'),

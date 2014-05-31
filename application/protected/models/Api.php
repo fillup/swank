@@ -10,12 +10,17 @@ class Api extends ApiBase
                  'value' => Utils::getRandStr(),
                  'setOnEmpty' => true, 'on' => 'insert'),
             array('id','unsafe'),
+            array('application_id','match','allowEmpty' => false, 'not' => false,
+                'pattern' => '/[a-zA-Z0-9\-]{32}/', 'message' => 'Application ID required.'),
             array('updated', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'update'),
             array('created,updated', 'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'insert')
+                'setOnEmpty' => false, 'on' => 'insert'),
+            array('path','match','allowEmpty' => false, 'not' => false,
+                'pattern' => '/^\/.*/', 'message' => 'Path is required and must start with a /.'),
+            array('description', 'safe'),
         ));
         
         return $newRules;

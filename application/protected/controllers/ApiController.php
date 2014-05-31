@@ -222,44 +222,21 @@ class ApiController extends Controller
             $path = $req->getParam('path',false);
             $description = $req->getParam('description',null);
             
-            if(!$application_id){
-                $e = new \Exception('Creating a new API requires an application_id',400);
-                $this->returnError($e);
-            } elseif(!$path){
-                $e = new \Exception('A path is required.',400);
-                $this->returnError($e);
-            } else {
-                /**
-                 * Create new API record
-                 */
-                $api = new Api();
-                $api->application_id = $application_id;
-                $api->path = $path;
-                $api->description = $description;
-                try{
-                    if($api->save()){
-                        $results = array(
-                            'success' => true,
-                            'status' => 200,
-                            'count' => 1,
-                            'data' => $api->toArray(),
-                        );
-                    } else {
-                        $results = array(
-                            'success' => false,
-                            'status' => 500,
-                            'errors' => Utils::modelErrorsAsArray($api->getErrors()),
-                        );
-                    }
-                } catch (\Exception $e){
-                    $results = array(
-                        'success' => false,
-                        'status' => 500,
-                        'errors' => Utils::modelErrorsAsArray($api->getErrors()),
-                    );
-                }
-                
+
+            $api = new Api();
+            $api->attributes = $_POST;
+
+            if($api->save()){
+                $results = array(
+                    'success' => true,
+                    'status' => 200,
+                    'count' => 1,
+                    'data' => $api->toArray(),
+                );
                 $this->returnJson($results,$results['status']);
+            } else {
+                $e = new \Exception("Unable to create api: ".Utils::modelErrorsAsHtml($api->getErrors()),500);
+                $this->returnError($e,500);
             }
         } elseif ($req->isPutRequest){
             if(!$id){
@@ -267,21 +244,10 @@ class ApiController extends Controller
                 $this->returnError($e,400);
             }
             
-            // Load parameters
-            $description = $req->getPut('description', null);
-            $path = $req->getPut('path', false);
-
-            // Clean any beginning/ending whitespace before validation
-            $description = $description ? trim($description) : $description;
-            $path = $path ? trim($path) : $path;
-            
-            $api->description = $description ?: $api->description;
-            $api->path = $path ?: $api->path;
+            $api->attributes = $this->getPutVars();
             if($api->save()){
-                $results = array(
-                    'success' => true
-                );
-                $this->returnJson($results, 200);
+                $results = array();
+                $this->returnJson($results, 204);
             } else {
                 $e = new \Exception("Unable to update api: ".Utils::modelErrorsAsHtml($api->getErrors()),500);
                 $this->returnError($e,500);
@@ -368,78 +334,39 @@ class ApiController extends Controller
             
             $this->returnJson($results,$results['status']);
         } elseif($req->isPostRequest){
+            $method = $req->getParam('method',false);
             /**
-             * Create a new API Operation
+             * Make sure an API operation with this method doesn't already
+             * exist.
              */
-            $method = $req->getParam('method', false);
-            $nickname = $req->getParam('nickname', false);
-            $type = $req->getParam('type',false);
-            $summary = $req->getParam('summary',null);
-            $notes = $req->getParam('notes',null);
-            
-            
-            if(!$api_id){
-                $e = new \Exception('Creating a new API Operation requires an api_id',400);
-                $this->returnError($e);
-            } elseif(!$method){
-                $e = new \Exception('A method is required.',400);
-                $this->returnError($e);
-            } elseif(!$nickname){
-                $e = new \Exception('A nickname is required.',400);
-                $this->returnError($e);
-            } elseif(!$method){
-                $e = new \Exception('A type is required.',400);
-                $this->returnError($e);
+            $check = ApiOperation::model()->findByAttributes(array(
+                'api_id' => $api_id,
+                'method' => strtoupper($method),
+            ));
+            if($check){
+                $e = new \Exception('An API operation with method '
+                        .CHtml::encode(strtoupper($method))
+                        .' for this API already exists, nickname: '
+                        .$check->nickname);
+                $this->returnError($e,400);
+            }
+            /**
+             * Create new Api Operation record
+             */
+            $op = new ApiOperation();
+            $op->attributes = $_POST;
+
+            if($op->save()){
+                $results = array(
+                    'success' => true,
+                    'status' => 200,
+                    'count' => 1,
+                    'data' => $op->toArray(),
+                );
+                $this->returnJson($results,200);
             } else {
-                /**
-                 * Make sure an API operation with this method doesnt already
-                 * exist.
-                 */
-                $check = ApiOperation::model()->findByAttributes(array(
-                    'api_id' => $api_id,
-                    'method' => strtoupper($method),
-                ));
-                if($check){
-                    $e = new \Exception('An API operation with method '
-                            .CHtml::encode(strtoupper($method))
-                            .' for this API already exists, nickname: '
-                            .$check->nickname);
-                    $this->returnError($e);
-                }
-                /**
-                 * Create new Api Operation record
-                 */
-                $op = new ApiOperation();
-                $op->api_id = $api_id;
-                $op->method = strtoupper($method);
-                $op->nickname = $nickname;
-                $op->type = $type;
-                $op->summary = $summary;
-                $op->notes = $notes;
-                try{
-                    if($op->save()){
-                        $results = array(
-                            'success' => true,
-                            'status' => 200,
-                            'count' => 1,
-                            'data' => $op->toArray(),
-                        );
-                    } else {
-                        $results = array(
-                            'success' => false,
-                            'status' => 500,
-                            'errors' => Utils::modelErrorsAsArray($op->getErrors()),
-                        );
-                    }
-                } catch (\Exception $e){
-                    $results = array(
-                        'success' => false,
-                        'status' => 500,
-                        'errors' => Utils::modelErrorsAsArray($op->getErrors()),
-                    );
-                }
-                
-                $this->returnJson($results,$results['status']);
+                $e = new \Exception("Unable to create api operation: ".Utils::modelErrorsAsHtml($op->getErrors()),400);
+                $this->returnError($e,400);
             }
         } elseif($req->isPutRequest){
             if(!$id){
@@ -447,31 +374,11 @@ class ApiController extends Controller
                 $this->returnError($e,400);
             }
             
-            // Load parameters
-            $method = $req->getPut('method', false);
-            $nickname = $req->getPut('nickname', false);
-            $type = $req->getPut('type',false);
-            $summary = $req->getPut('summary',false);
-            $notes = $req->getPut('notes',false);
-
-            // Clean any beginning/ending whitespace before validation
-            $method = $method ? trim(strtoupper($method)) : $method;
-            $nickname = $nickname ? trim($nickname) : $nickname;
-            $type = $type ? trim($type) : $type;
-            $summary = $summary ? trim($summary) : $summary;
-            $notes = $notes ? trim($notes) : $notes;
-            
-            $operation->method = $method ?: $operation->method;
-            $operation->nickname = $nickname ?: $operation->nickname;
-            $operation->type = $type ?: $operation->type;
-            $operation->summary = $summary ?: $operation->summary;
-            $operation->notes = $notes ?: $operation->notes;
+            $operation->attributes = $this->getPutVars();
             
             if($operation->save()){
-                $results = array(
-                    'success' => true
-                );
-                $this->returnJson($results, 200);
+                $results = array();
+                $this->returnJson($results, 204);
             } else {
                 $e = new \Exception("Unable to update api operation: ".Utils::modelErrorsAsHtml($operation->getErrors()),400);
                 $this->returnError($e,400);
@@ -558,144 +465,53 @@ class ApiController extends Controller
             
             $this->returnJson($results,$results['status']);
         } elseif($req->isPostRequest){
-            /**
-             * Create a new API Parameter
-             */
-            $paramType = $req->getParam('paramType', false);
             $name = $req->getParam('name', false);
-            $description = $req->getParam('description',false);
-            $dataType = $req->getParam('dataType',null);
-            $format = $req->getParam('format',null);
-            $required = $req->getParam('required',true);
-            $minimum = $req->getParam('minimum',null);
-            $maximum = $req->getParam('maximum',null);
-            $enum = $req->getParam('enum',null);
-            
-            if(!$operation_id){
-                $e = new \Exception('Creating a new API Parameter requires an operation_id',400);
+
+            /**
+             * Make sure this is not a duplicate parameter for the same operation
+             */
+            $check = ApiParameter::model()->findByAttributes(array(
+                'operation_id' => $operation_id,
+                'name' => $name,
+            ));
+            if($check){
+                $e = new \Exception('An API parameter with name '
+                        .CHtml::encode($name)
+                        .' for this API Operation ('
+                        .CHtml::encode($check->operation->nickname)
+                        .') already exists for method:'. CHtml::encode($check->operation->method));
                 $this->returnError($e);
-            } elseif(!$paramType || !in_array($paramType, $this->validParamTypes)){
-                $e = new \Exception('A valid param type is required (path,query,body,header,form).',400);
-                $this->returnError($e);
-            } elseif(!$name){
-                $e = new \Exception('A name is required.',400);
-                $this->returnError($e);
-            } elseif(!$description){
-                $e = new \Exception('Description is required.',400);
-                $this->returnError($e);
-            } elseif(!$dataType || !in_array($dataType, array_keys($this->validDataTypes))){
-                $e = new \Exception('A valid data type is required ('
-                        . implode(',', array_keys($this->validDataTypes)).').',400);
-                $this->returnError($e);
-            } 
-//            elseif(!$format){
-//                $e = new \Exception('Format is required.',400);
-//                $this->returnError($e);
-//            } 
-            else {
-                /**
-                 * Make sure an API operation with this method doesnt already
-                 * exist.
-                 */
-                $check = ApiParameter::model()->findByAttributes(array(
-                    'operation_id' => $operation_id,
-                    'name' => $name,
-                ));
-                if($check){
-                    $e = new \Exception('An API parameter with name '
-                            .CHtml::encode($name)
-                            .' for this API Operation ('
-                            .CHtml::encode($check->operation->nickname)
-                            .') already exists for method:'. CHtml::encode($check->operation->method));
-                    $this->returnError($e);
-                }
-                
-                /**
-                 * Additional conditional validation 
-                 */
-                // Flatten enum options into comma-separated string
-                if(is_array($enum)){
-                    $enum = implode(',', $enum);
-                }
-                // Check that format is valid for dataType
-//                if(!in_array($format,$this->validDataTypes[$dataType])){
-//                    $e = new \Exception('A valid format is required for dataType '
-//                            .CHtml::encode($dataType).': '
-//                            .array_values($this->validDataTypes[$dataType]),400);
-//                    $this->returnError($e);
-//                }
+            }
+
                 
                 /**
                  * Create new Api Parameter record
                  */
                 $param = new ApiParameter();
-                $param->operation_id = $operation_id;
-                $param->paramType = $paramType;
-                $param->name = $name;
-                $param->description = $description;
-                $param->dataType = $dataType;
-                $param->format = $format;
-                $param->required = $required;
-                $param->minimum = $minimum;
-                $param->maximum = $maximum;
-                $param->enum = $enum;
-                try{
-                    if($param->save()){
-                        $results = array(
-                            'success' => true,
-                            'status' => 200,
-                            'count' => 1,
-                            'data' => $param->toArray(),
-                        );
-                    } else {
-                        $results = array(
-                            'success' => false,
-                            'status' => 500,
-                            'errors' => Utils::modelErrorsAsArray($param->getErrors()),
-                        );
-                    }
-                } catch (\Exception $e){
+                $param->attributes = $_POST;
+                if($param->save()){
                     $results = array(
-                        'success' => false,
-                        'status' => 500,
-                        'errors' => Utils::modelErrorsAsArray($param->getErrors()),
+                        'success' => true,
+                        'status' => 200,
+                        'count' => 1,
+                        'data' => $param->toArray(),
                     );
+                    $this->returnJson($results,$results['status']);
+                } else {
+                    $e = new \Exception("Unable to create api parameter: ".Utils::modelErrorsAsHtml($param->getErrors()),500);
+                    $this->returnError($e,500);
                 }
-                
-                $this->returnJson($results,$results['status']);
-            }
         } elseif($req->isPutRequest){
             if(!$id){
                 $e = new \Exception('Api Parameter ID is required to update',400);
                 $this->returnError($e,400);
             }
             
-            // Load parameters
-            $paramType = $req->getPut('paramType', false);
-            $name = $req->getPut('name', false);
-            $description = $req->getPut('description',false);
-            $dataType = $req->getPut('dataType',false);
-            $format = $req->getPut('format',false);
-            $required = $req->getPut('required',null);
-            $minimum = $req->getPut('minimum',false);
-            $maximum = $req->getPut('maximum',false);
-            $enum = $req->getPut('enum',false);
-            
-            $api_param->paramType = $paramType ?: $api_param->paramType;
-            $api_param->name = $name ?: $api_param->name;
-            $api_param->description = $description ?: $api_param->description;
-            $api_param->dataType = $dataType ?: $api_param->dataType;
-            $api_param->format = $format ?: $api_param->format;
-            $api_param->required = !is_null($required) && is_bool($required) ? $required : $api_param->required;
-            $api_param->minimum = $minimum ?: $api_param->minimum;
-            $api_param->maximum = $maximum ?: $api_param->maximum;
-            $api_param->enum = $enum ?: $api_param->enum;
+            $api_param->attributes = $this->getPutVars();
             
             if($api_param->save()){
-                $results = array(
-                    'success' => true
-                );
-                $this->returnJson($results, 200);
+                $results = array();
+                $this->returnJson($results, 204);
             } else {
                 $e = new \Exception("Unable to update api parameter: ".Utils::modelErrorsAsHtml($api_param->getErrors()),500);
                 $this->returnError($e,500);

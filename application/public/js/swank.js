@@ -127,6 +127,7 @@ function updateApplication()
  */
 function updateApi(id)
 {
+    hideModalAlert(id)
     var formId = '#formUpdateApi-'+id;
     var path = $((formId+' [name=path]')).val();
     var desc = $((formId+' [name=description]')).val();
@@ -158,12 +159,8 @@ function updateApi(id)
             },
             success: function(response) {
                 console.log(response);
-                if (response.success === true) {
-                    showModalAlert(id,true,'API updated successfuly, you may now add operations to this API.');
-                    loadApiListMenu();
-                } else {
-                    showModalAlert(id,false,'[' + response.code + '] ' + response.error);
-                }
+                showModalAlert(id,true,'API updated successfully, you may now add operations to this API.');
+                loadApiListMenu();
             },
             error: function(xhr) {
                 var response = $.parseJSON(xhr.responseText);
@@ -180,6 +177,7 @@ function updateApi(id)
  */
 function updateOperation(id)
 {
+    hideModalAlert(id);
     var formId = '#formUpdateOperation-'+id;
     var operationMethod = $((formId+' [name=operationMethod]')).val();
     var nickname = $((formId+' [name=nickname]')).val();
@@ -215,12 +213,8 @@ function updateOperation(id)
             },
             success: function(response) {
                 console.log(response);
-                if (response.success === true || response.success === 'true') {
-                    showModalAlert(id,true,'Operation updated successfuly, you may now add parameters and responses to this Operation.');
-                    loadOperationListMenu(api_id);
-                } else {
-                    showModalAlert(id,false,'[' + response.code + '] ' + response.error);
-                }
+                showModalAlert(id,true,'Operation updated successfully, you may now add parameters and responses to this Operation.');
+                loadOperationListMenu(api_id);
             },
             error: function(xhr) {
                 var response = $.parseJSON(xhr.responseText);
@@ -237,6 +231,7 @@ function updateOperation(id)
  */
 function updateParameter(id)
 {
+    hideModalAlert(id);
     var formId = '#formUpdateParameter-'+id;
     var name = $((formId+' [name=name]')).val();
     var paramType = $((formId+' [name=paramType]')).val();
@@ -254,7 +249,7 @@ function updateParameter(id)
     } else {
         // Set default method and url
         var method = 'POST';
-        var url = '/index-test.php/api/apiParameter';
+        var url = '/api/apiParameter';
         // Update method and url if this is an existing application
         if (id !== 'NEW') {
             method = 'PUT';
@@ -274,12 +269,8 @@ function updateParameter(id)
             },
             success: function(response) {
                 console.log(response);
-                if (response.success === true) {
-                    showModalAlert(id,true,'Parameter updated successfuly.');
-                    loadParameterListMenu(operation_id);
-                } else {
-                    showModalAlert(id,false,'[' + response.code + '] ' + response.error);
-                }
+                showModalAlert(id,true,'Parameter updated successfully.');
+                loadParameterListMenu(operation_id);
             },
             error: function(xhr) {
                 var response = $.parseJSON(xhr.responseText);
