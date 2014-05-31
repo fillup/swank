@@ -103,108 +103,34 @@ class ApiController extends Controller
                 }
             }
         } elseif($req->isPostRequest && $id === false){
-            // Load parameters
-            $name           = $req->getParam('name',false);
-            $description    = $req->getParam('description', null);
-            $base_path      = $req->getParam('base_path', false);
-            $resource_path  = $req->getParam('resource_path', false);
-            $api_version    = $req->getParam('api_version', false);
-            $visibility     = $req->getParam('visibility',false);
-            $authorization_type     = $req->getParam('authorization_type',false);
-            $authorization_config   = $req->getParam('authorization_config',null);
 
-            // Clean any beginning/ending whitespace before validation
-            $name           = $name ? trim($name) : $name;
-            $description    = $description ? trim($description) : $description;
-            $base_path      = $base_path ? trim($base_path) : $base_path;
-            $resource_path  = $resource_path ? trim($resource_path) : $resource_path;
-            $api_version    = $api_version ? trim($api_version) : $api_version;
-            $visibility     = $visibility ? trim($visibility) : $visibility;
-            $authorization_type     = $authorization_type ? trim($authorization_type) : $authorization_type;
-            $authorization_config     = $authorization_config ? trim($authorization_config) : $authorization_config;
-            
-            // This is a new Application, validate all fields
-            if(!$name){
-                $e = new \Exception('Name is required',400);
-                $this->returnError($e,400);
-            } elseif(!$base_path){
-                $e = new \Exception('Base Path does not look like a url. Must start with either http:// or https://.',400);
-                $this->returnError($e,400);
-            } elseif(!$resource_path){
-                $e = new \Exception('Resource Path should be a path relative to the Base Path, for example: /api',400);
-                $this->returnError($e,400);
-            } elseif(!$authorization_type || !in_array($authorization_type,Application::$AUTHORIZATION_TYPES)){
-                $e = new \Exception('Authorization Type is required. Valid options are: '.implode(', '.Application::$AUTHORIZATION_TYPES),400);
-                $this->returnError($e,400);
+            $app = new Application();
+            $app->user_id = $this->_user->id;
+            $app->attributes=$_POST;
+            if($app->save()){
+                $results = array(
+                    'success' => true,
+                    'status' => 200,
+                    'count' => 1,
+                    'data' => $app->toArray(),
+                );
+                $this->returnJson($results,200);
             } else {
-                if(substr($base_path,-1) == '/'){
-                    $base_path = substr($base_path, 0, -1);
-                }
-                $app = new Application();
-                $app->name = $name;
-                $app->description = $description;
-                $app->api_version = $api_version;
-                $app->base_path = $base_path;
-                $app->resource_path = $resource_path;
-                $app->user_id = $this->_user->id;
-                $app->visibility = $visibility;
-                $app->authorization_type = $authorization_type;
-                $app->authorization_config = $authorization_config;
-                if($app->save()){
-                    $results = array(
-                        'success' => true,
-                        'status' => 200,
-                        'count' => 1,
-                        'data' => $app->toArray(),
-                    );
-                    $this->returnJson($results,200);
-                } else {
-                    $e = new \Exception("Unable to create new application record: ".Utils::modelErrorsAsHtml($app->getErrors(),true),205);
-                    $this->returnError($e,400);
-                }
+                $e = new \Exception("Unable to create new application record: ".Utils::modelErrorsAsHtml($app->getErrors(),true),205);
+                $this->returnError($e,400);
             }
+
         } elseif($req->isPutRequest) {
             if(!$id){
                 $e = new \Exception('Application ID is required to update',400);
                 $this->returnError($e);
             }
             
-            // Load parameters
-            $name = $req->getPut('name',false);
-            $description = $req->getPut('description', null);
-            $base_path = $req->getPut('base_path', false);
-            $resource_path = $req->getPut('resource_path', false);
-            $api_version = $req->getPut('api_version', false);
-            $visibility = $req->getPut('visibility', false);
-            $authorization_type     = $req->getPut('authorization_type',false);
-            $authorization_config   = $req->getPut('authorization_config',null);
-            if(is_array($authorization_config)){
-                $authorization_config = json_encode($authorization_config);
-            }
-
-            // Clean any beginning/ending whitespace before validation
-            $name = $name ? trim($name) : $name;
-            $description = $description ? trim($description) : $description;
-            $base_path = $base_path ? trim($base_path) : $base_path;
-            $resource_path = $resource_path ? trim($resource_path) : $resource_path;
-            $api_version = $api_version ? trim($api_version) : $api_version;
-            $visibility = $visibility ? trim($visibility) : $visibility;
-            $authorization_type = $authorization_type ? trim($authorization_type) : $authorization_type;
-            
-            $application->name = $name ?: $application->name;
-            $application->description = $description ?: $application->description;
-            $application->base_path = $base_path ?: $application->base_path;
-            $application->resource_path = $resource_path ?: $application->resource_path;
-            $application->api_version = $api_version ?: $application->api_version;
-            $application->visibility = $visibility ?: $application->visibility;
-            $application->authorization_type = $authorization_type ?: $application->authorization_type;
-            $application->authorization_config = $authorization_config ?: $application->authorization_config;
+            $application->attributes=$this->getPutVars();
 
             if($application->save()){
-                $results = array(
-                    'success' => true
-                );
-                $this->returnJson($results, 200);
+                $results = array();
+                $this->returnJson($results, 204);
             } else {
                 $e = new \Exception("Unable to update application: ".Utils::modelErrorsAsHtml($application->getErrors()),500);
                 $this->returnError($e);
@@ -212,7 +138,7 @@ class ApiController extends Controller
             
         } elseif(strtoupper($req->requestType) == 'DELETE'){
             if(!$id){
-                $e = new \Exception('Application ID is required to update',400);
+                $e = new \Exception('Application ID is required to delete',400);
                 $this->returnError($e);
             }
             

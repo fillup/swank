@@ -9,6 +9,7 @@ class ApiResponse extends ApiResponseBase
             array('id','default',
                  'value' => Utils::getRandStr(),
                  'setOnEmpty' => true, 'on' => 'insert'),
+            array('id','unsafe'),
             array('updated', 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => false, 'on' => 'update'),

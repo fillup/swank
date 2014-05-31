@@ -108,15 +108,9 @@ function updateApplication()
                 authorization_config: authorization_config
             },
             success: function(response) {
-                console.log(response);
-                if (response.success === true) {
-                    application_id = response.application_id;
-                    $('#buttonUpdateApplication').html('Update Application');
-                    $('#applicationNameTitle').html(' - ' + application_name);
-                    showAlert('applicationSuccess', 'Application created successfuly, you may now add APIs to your application.');
-                } else {
-                    showAlert('applicationError', '[' + response.code + '] ' + response.error);
-                }
+                $('#buttonUpdateApplication').html('Update Application');
+                $('#applicationNameTitle').html(' - ' + application_name);
+                showAlert('applicationSuccess', 'Application created successfully, you may now add APIs to your application.');
             },
             error: function(xhr) {
                 var response = $.parseJSON(xhr.responseText);

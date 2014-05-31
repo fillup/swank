@@ -36,7 +36,7 @@ class Controller extends CController
     public function returnJson($data, $status = 200)
     {
         // Set the content type header.
-        header('Content-type: applicaton/json', true, $status);
+        header('Content-type: application/json', true, $status);
 
         // Output the JSON data.
         echo json_encode($data);
@@ -60,6 +60,17 @@ class Controller extends CController
         );
 
         $this->returnJson($data, $status);
+    }
+
+    /**
+     * Since PHP does not have $_PUT, this should parse the PUT request and
+     * return an array of the parameters.
+     * @return array
+     */
+    public function getPutVars()
+    {
+        parse_str(file_get_contents("php://input"),$put_vars);
+        return $put_vars;
     }
 
 }
