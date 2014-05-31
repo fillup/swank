@@ -3,7 +3,7 @@
 class ApiParameter extends ApiParameterBase
 {
     
-    public $primativeDataTypes = array(
+    public $primitiveDataTypes = array(
         'integer','number','string','boolean','date','date-time'
     );
     
@@ -34,8 +34,8 @@ class ApiParameter extends ApiParameterBase
                 'pattern' => '/[a-zA-Z0-9\-]{32}/', 'message' => 'Operation ID required.'),
             array('paramType','in','range'=>array_keys($this->validParamTypes),
                 'allowEmpty' => false, 'message' => 'Parameter type must be one of: '.implode(', ',array_keys($this->validParamTypes))),
-            array('dataType','in','range'=>$this->primativeDataTypes,
-                'allowEmpty' => false, 'message' => 'Data type must be one of: '.implode(', ',$this->primativeDataTypes)),
+            array('dataType','in','range'=>$this->primitiveDataTypes,
+                'allowEmpty' => false, 'message' => 'Data type must be one of: '.implode(', ',$this->primitiveDataTypes)),
             array('format','default','value' => null, 'setOnEmpty' => true),
             array('updated', 'default',
                 'value' => new CDbExpression('NOW()'),

@@ -143,6 +143,45 @@ class GenController extends Controller {
         echo $modal;
     }
 
+    public function actionGetEditResponseForm($id=false)
+    {
+        $this->layout = '';
+        $found = false;
+
+        $operation_id = Yii::app()->request->getParam('operation_id',false);
+
+        $title = "Create Response";
+        if($id){
+            $response = ApiResponse::model()->findByPk($id);
+            if($response && $response->operation->api->application->user_id == Yii::app()->user->getId()){
+                $found = $response;
+                $title = "Update Response";
+                $operation_id = $response->operation_id;
+            }
+        } else {
+            $id = 'NEW';
+        }
+        if(!$found){
+            $found = new ApiResponse();
+            $found->operation_id = $operation_id;
+        }
+
+        $form = $this->renderPartial('/partials/response-form',array(
+                'response' => $found,
+                'id' => $id,
+            ),true);
+
+        $modal = $this->renderPartial('/partials/modal',array(
+                'id' => $id,
+                'title' => $title,
+                'body' => $form,
+                'saveable' => true,
+                'saveAction' => "updateResponse('$id')",
+            ),true);
+
+        echo $modal;
+    }
+
     public function actionGetAuthorizationConfigForm($id=false)
     {
         $this->layout = '';

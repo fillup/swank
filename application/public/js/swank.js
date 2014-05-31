@@ -283,6 +283,58 @@ function updateParameter(id)
 }
 
 /**
+ * Create/Update a Response
+ */
+function updateResponse(id)
+{
+    hideModalAlert(id);
+    var formId = '#formUpdateResponse-'+id;
+    var code = $((formId+' [name=code]')).val();
+    var message = $((formId+' [name=message]')).val();
+    var responseModel = $((formId+' [name=responseModel]')).val();
+    var operation_id = $((formId+' [name=operation_id]')).val();
+
+    if(code.length < 1){
+        showModalAlert(id,false,'A valid HTTP status code is required');
+        return false;
+    } else if (message.length < 1){
+        showModalAlert(id,false,'A response message is required.');
+        return false;
+    } else {
+        // Set default method and url
+        var method = 'POST';
+        var url = '/api/apiResponse';
+        // Update method and url if this is an existing application
+        if (id !== 'NEW') {
+            method = 'PUT';
+            url += '/' + id;
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: {
+                code: code,
+                message: message,
+                responseModel: responseModel,
+                operation_id: operation_id
+            },
+            success: function(response) {
+                console.log(response);
+                showModalAlert(id,true,'Response updated successfully.');
+                loadResponseListMenu(operation_id);
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+            }
+        });
+    }
+
+    return false;
+}
+
+/**
  * Loads list of defined APIs for application into left menu under Add APIs 
  * section
  */
@@ -329,7 +381,7 @@ function loadOperationListMenu(api_id)
             $('.operationListItem').click(function(){
                operation_id = this.id;
                loadParameterListMenu(this.id);
-               //loadResponseListMenu(this.id);
+               loadResponseListMenu(this.id);
                setRowActiveForTdId(this.id);
             });
         });
@@ -362,7 +414,7 @@ function loadParameterListMenu(operation_id)
 }
 
 /**
- * Loads list of defined Operations for a given API
+ * Loads list of defined Responses for a given API
  */
 function loadResponseListMenu(operation_id)
 {
@@ -372,7 +424,7 @@ function loadResponseListMenu(operation_id)
         var url = '/api/apiResponse?operation_id='+operation_id;
         $.getJSON(url, function(responses){
             console.log(responses.data);
-            $("#responsesListTablePlaceholder").html(responsesListTableTemplate(operations));
+            $("#responsesListTablePlaceholder").html(responsesListTableTemplate(responses));
             /**
              * Add onClick action for APIs in the list to load
              * the operations menu
@@ -380,6 +432,7 @@ function loadResponseListMenu(operation_id)
             $('.responseListItem').click(function(){
                response_id = this.id;
                setRowActiveForTdId(this.id);
+               showModal(this.id,'/gen/getEditResponseForm/'+this.id);
             });
         });
     }
