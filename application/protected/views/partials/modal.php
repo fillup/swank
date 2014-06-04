@@ -6,7 +6,9 @@
  * $title - Header/title for modal
  * $body - Body content, html
  * $saveable - boolean of whether or not to show a save button
+ * $deleteable - boolean of whether or not to show the delete button
  * $saveAction - javascript function call for save action
+ * $deleteAction - javascript function call for delete action
  */
 ?>
 <!-- Modal -->
@@ -29,6 +31,15 @@
                 <?php echo $body; ?>
             </div>
             <div class="modal-footer">
+                <?php
+                    if($deleteable){
+                ?>
+                    <button id="save-button-<?php echo $id; ?>"
+                            class="btn btn-danger pull-left"
+                            onclick="<?php echo $deleteAction; ?>"><i class="icon-trash"></i> Delete</button>
+                <?php
+                    }
+                ?>
                 <button class="btn <?php if (!$saveable) {
                     echo 'btn-primary';
                 } ?>" 

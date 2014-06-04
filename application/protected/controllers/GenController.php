@@ -60,6 +60,8 @@ class GenController extends Controller {
             'body' => $form,
             'saveable' => true,
             'saveAction' => "updateApi('$id')",
+            'deleteable' => true,
+            'deleteAction' => "deleteApi('$id')",
         ),true);
         
         echo $modal;
@@ -99,6 +101,8 @@ class GenController extends Controller {
             'body' => $form,
             'saveable' => true,
             'saveAction' => "updateOperation('$id')",
+            'deleteable' => true,
+            'deleteAction' => "deleteOperation('$id')",
         ),true);
         
         echo $modal;
@@ -138,6 +142,8 @@ class GenController extends Controller {
             'body' => $form,
             'saveable' => true,
             'saveAction' => "updateParameter('$id')",
+            'deleteable' => true,
+            'deleteAction' => "deleteParameter('$id')",
         ),true);
         
         echo $modal;
@@ -177,6 +183,8 @@ class GenController extends Controller {
                 'body' => $form,
                 'saveable' => true,
                 'saveAction' => "updateResponse('$id')",
+                'deleteable' => true,
+                'deleteAction' => "deleteResponse('$id')",
             ),true);
 
         echo $modal;

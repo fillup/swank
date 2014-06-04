@@ -123,6 +123,7 @@
                         <div class="col-lg-offset-2 col-lg-10">
                             <button type="submit" id="buttonUpdateApplication" 
                                     class="btn btn-primary">
+                                <span class="glyphicon glyphicon-ok"></span> 
                                 <?php
                                     if(!is_null($application->id)){
                                         echo 'Update Application';
@@ -130,6 +131,10 @@
                                         echo "Create Application";
                                     }
                                 ?>
+                            </button>
+                            <button type="submit" id="buttonUpdateApplication"
+                                    class="btn btn-danger">
+                                <span class="glyphicon glyphicon-trash"></span> Delete Application
                             </button>
                         </div>
                     </div>

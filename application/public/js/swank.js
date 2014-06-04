@@ -173,6 +173,32 @@ function updateApi(id)
 }
 
 /**
+ * Delete API
+ * @param id
+ * @returns {boolean}
+ */
+function deleteApi(id)
+{
+    hideModalAlert(id);
+    var conf = confirm('Are you sure you want to delete this API?');
+    if(conf){
+        $.ajax({
+            url: '/api/api/'+id,
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
+                showModalAlert(id,true,'API Deleted successfully.');
+                loadApiListMenu();
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+            }
+        });
+    }
+}
+
+/**
  * Create/Update an Operation
  */
 function updateOperation(id)
@@ -224,6 +250,36 @@ function updateOperation(id)
     }
     
     return false;
+}
+
+/**
+ * Delete Operation
+ * @param id
+ * @returns {boolean}
+ */
+function deleteOperation(id)
+{
+    hideModalAlert(id);
+    var formId = '#formUpdateOperation-'+id;
+    var api_id = $((formId+' [name=api_id]')).val();
+    var conf = confirm('Are you sure you want to delete this Operation?');
+    if(conf){
+        $.ajax({
+            url: '/api/apiOperation/'+id,
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
+                showModalAlert(id,true,'Operation Deleted successfully.');
+                loadOperationListMenu(api_id);
+                loadParameterListMenu(null);
+                loadResponseListMenu(null);
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+            }
+        });
+    }
 }
 
 /**
@@ -283,6 +339,34 @@ function updateParameter(id)
 }
 
 /**
+ * Delete Parameter
+ * @param id
+ * @returns {boolean}
+ */
+function deleteParameter(id)
+{
+    hideModalAlert(id);
+    var formId = '#formUpdateParameter-'+id;
+    var operation_id = $((formId+' [name=operation_id]')).val();
+    var conf = confirm('Are you sure you want to delete this Parameter?');
+    if(conf){
+        $.ajax({
+            url: '/api/apiParameter/'+id,
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
+                showModalAlert(id,true,'Parameter Deleted successfully.');
+                loadParameterListMenu(operation_id);
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+            }
+        });
+    }
+}
+
+/**
  * Create/Update a Response
  */
 function updateResponse(id)
@@ -332,6 +416,34 @@ function updateResponse(id)
     }
 
     return false;
+}
+
+/**
+ * Delete Response
+ * @param id
+ * @returns {boolean}
+ */
+function deleteResponse(id)
+{
+    hideModalAlert(id);
+    var formId = '#formUpdateResponse-'+id;
+    var operation_id = $((formId+' [name=operation_id]')).val();
+    var conf = confirm('Are you sure you want to delete this Operation?');
+    if(conf){
+        $.ajax({
+            url: '/api/apiResponse/'+id,
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
+                showModalAlert(id,true,'Operation Deleted successfully.');
+                loadResponseListMenu(operation_id);
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showModalAlert(id,false,'[' + response.code + '] ' + response.error);
+            }
+        });
+    }
 }
 
 /**
@@ -385,6 +497,8 @@ function loadOperationListMenu(api_id)
                setRowActiveForTdId(this.id);
             });
         });
+    } else {
+        $('#operationsListTablePlaceholder').html("<p style='text-align: center;'><i>(Select an API)</i></p>");
     }
 }
 
@@ -410,6 +524,8 @@ function loadParameterListMenu(operation_id)
                showModal(this.id,'/gen/getEditParameterForm/'+this.id);
             });
         });
+    } else {
+        $('#parametersListTablePlaceholder').html("<p style='text-align: center;'><i>(Select an Operation)</i></p>");
     }
 }
 
@@ -435,6 +551,8 @@ function loadResponseListMenu(operation_id)
                showModal(this.id,'/gen/getEditResponseForm/'+this.id);
             });
         });
+    } else {
+        $('#responsesListTablePlaceholder').html("<p style='text-align: center;'><i>(Select an Operation)</i></p>");
     }
 }
 
