@@ -9,9 +9,12 @@ var responsesListTableTemplate;
  */
 $(function(){
     if (typeof application_id !== 'undefined' && application_id !== null) {
-        $('#buttonUpdateApplication').html('Update Application');
+        $('#buttonUpdateApplication').html('<span class="glyphicon glyphicon-ok"></span> Update Application');
         //loadApiListMenu();
         $('#addApisPanel').show();
+        $('#buttonDeleteApplication').click(function(){
+            deleteApplication(application_id);
+        });
     }
     
     $('#addApiOperationButton').click(function(){
@@ -170,6 +173,25 @@ function updateApi(id)
     }
     
     return false;
+}
+
+function deleteApplication(id)
+{
+    var conf = confirm('Are you sure you want to delete this Application?');
+    if(conf){
+        $.ajax({
+            url: '/api/application/'+id,
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
+                window.location = '/me';
+            },
+            error: function(xhr) {
+                var response = $.parseJSON(xhr.responseText);
+                showAlert('applicationError', 'Unable to delete application: [' + response.code + '] ' + response.error);
+            }
+        });
+    }
 }
 
 /**

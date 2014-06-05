@@ -121,21 +121,21 @@
                     </div>
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
-                            <button type="submit" id="buttonUpdateApplication" 
+                            <button id="buttonUpdateApplication"
                                     class="btn btn-primary">
-                                <span class="glyphicon glyphicon-ok"></span> 
-                                <?php
-                                    if(!is_null($application->id)){
-                                        echo 'Update Application';
-                                    } else {
-                                        echo "Create Application";
-                                    }
-                                ?>
+                                <span class="glyphicon glyphicon-ok"></span>
+                                <?php echo !is_null($application->id) ? 'Update Application' : 'Create Application'; ?>
                             </button>
-                            <button type="submit" id="buttonUpdateApplication"
+                            <?php
+                                if(!is_null($application->id)){
+                            ?>
+                            <button id="buttonDeleteApplication"
                                     class="btn btn-danger">
                                 <span class="glyphicon glyphicon-trash"></span> Delete Application
                             </button>
+                            <?php
+                                }
+                            ?>
                         </div>
                     </div>
                 </form>

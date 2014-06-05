@@ -21,7 +21,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
         ),
         array(// display a column with "view", "update" and "delete" buttons
             'class' => 'CButtonColumn',
-            'template' => '{view}{update}{delete}',
+            'template' => '{view}{update}',
             'buttons' => array(
                 'view' => array(
                     'label' => 'View Swagger UI',
@@ -32,7 +32,6 @@ $this->widget('zii.widgets.grid.CGridView', array(
                     'url' => 'Yii::app()->createUrl("gen/$data->id")',
                 ),
             ),
-            'deleteConfirmation'=>"js:'Record with ID '+$(this).parent().parent().children(':first-child').text()+' will be deleted! Continue?'",
         ),
     ),
     'htmlOptions' => array(
