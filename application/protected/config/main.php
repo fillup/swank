@@ -11,21 +11,27 @@ return array(
     'theme' => 'bootstrap',
     // preloading 'log' component
     'preload' => array('log'),
+    // path aliases
+    'aliases' => array(
+        'vendor' => realpath(__DIR__ . '/../../vendor'),
+        'bootstrap' => realpath(__DIR__ . '/../../vendor/crisu83/yiistrap'),
+    ),
     // autoloading model and component classes
     'import' => array(
         'application.models.*',
         'application.components.*',
         'application.utils.*',
+        'bootstrap.helpers.TbHtml',
     ),
     'modules' => array(
         
     ),
     // application components
     'components' => array(
-        'assetManager' => array(
-            'newFileMode' => 0777,
-            'newDirMode' => 0777,
-        ),
+//        'assetManager' => array(
+//            'newFileMode' => 0777,
+//            'newDirMode' => 0777,
+//        ),
         'user' => array(
             // enable cookie-based authentication
             'allowAutoLogin' => true,
@@ -67,6 +73,9 @@ return array(
               ),
              */
             ),
+        ),
+        'bootstrap' => array(
+            'class' => 'bootstrap.components.TbApi',
         ),
     ),
     // application-level parameters that can be accessed

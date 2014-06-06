@@ -1,26 +1,8 @@
 <?php
 
-// setup versions
-$bootstrapVersion = "3.0.0";
-$fontAwesomeVersion = "3.2.1";
-$jqueryVersion = "2.0.3";
-$queryUiVersion = "1.10.3";
-
-// setup scriptmap for jquery and jquery-ui cdn
+Yii::app()->bootstrap->register();
 $cs = Yii::app()->clientScript;
-$cs->scriptMap["jquery.js"] = "//ajax.googleapis.com/ajax/libs/jquery/$jqueryVersion/jquery.min.js";
-$cs->scriptMap["jquery.min.js"] = $cs->scriptMap["jquery.js"];
-$cs->scriptMap["jquery-ui.min.js"] = "//ajax.googleapis.com/ajax/libs/jqueryui/$queryUiVersion/jquery-ui.min.js";
-
-// fix jquery.ba-bbq.js for jquery 1.9+ (removed $.browser)
-// https://github.com/joshlangner/jquery-bbq/blob/master/jquery.ba-bbq.min.js
-$cs->scriptMap["jquery.ba-bbq.js"] = Yii::app()->theme->baseUrl . "/assets/js/jquery.ba-bbq.min.js";
-
-// register js files
-$cs->registerCoreScript('jquery');
-$cs->registerScriptFile("//netdna.bootstrapcdn.com/bootstrap/$bootstrapVersion/js/bootstrap.min.js", CClientScript::POS_BEGIN);
-//$cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/main.js", CClientScript::POS_END);
-$cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_BEGIN);
+$cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_END);
 $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS_END);
 
 ?>
@@ -33,15 +15,10 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <!-- CSS -->
-    <link href="//netdna.bootstrapcdn.com/bootstrap/<?php echo $bootstrapVersion; ?>/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/<?php echo $fontAwesomeVersion; ?>/css/font-awesome.min.css" rel="stylesheet">
-    <link href="<?php echo Yii::app()->theme->baseUrl; ?>/assets/css/main.css" rel="stylesheet">
-
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="<?php echo Yii::app()->theme->baseUrl . "/assets/js/html5shiv.js"; ?>"></script>
-    <script src="<?php echo Yii::app()->theme->baseUrl . "/assets/js/respond.min.js"; ?>"></script>
+    <!--<script src="<?php //echo Yii::app()->theme->baseUrl . "/assets/js/html5shiv.js"; ?>"></script>-->
+    <!--<script src="<?php //echo Yii::app()->theme->baseUrl . "/assets/js/respond.min.js"; ?>"></script>-->
     <![endif]-->
 
     <!-- Javascript -->

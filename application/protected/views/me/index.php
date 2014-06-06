@@ -5,7 +5,7 @@
     </a>
 </div>
 <?php
-$this->widget('zii.widgets.grid.CGridView', array(
+$this->widget('bootstrap.widgets.TbGridView', array(
     'dataProvider' => $myApps,
     'columns' => array(
         'name',
@@ -20,8 +20,8 @@ $this->widget('zii.widgets.grid.CGridView', array(
             'value' => 'date("M j, Y", strtotime($data->updated))',
         ),
         array(// display a column with "view", "update" and "delete" buttons
-            'class' => 'CButtonColumn',
-            'template' => '{view}{update}',
+            'class' => 'bootstrap.widgets.TbButtonColumn',
+            'template' => '{view} {update}',
             'buttons' => array(
                 'view' => array(
                     'label' => 'View Swagger UI',
