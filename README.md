@@ -31,7 +31,8 @@ if it enhances the product for the masses, I'll pull it in.
  - [x] Add ability to configure authentication type for an application, either token/key or none
  - [ ] Add support for oAuth authorization
  - [ ] Create new authentication option for signed tokens, example using a key and shared secret to calculate a signature to include in the call, I personally need this for use with [ApiAxle](http://apiaxle.com)
- - [ ] Add ability to delete things, applications, apis, operations, parameters, responses, etc.
+ - [x] Add ability to delete things, applications, apis, operations, parameters, responses, etc.
+ - [ ] Add unit tests and setup with travis-ci
 
 ### Adding Authorization Options ###
 Swagger supports three types of authorization right now: none, api_key, and oauth.
