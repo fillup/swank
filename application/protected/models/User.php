@@ -21,7 +21,10 @@ class User extends UserBase
                 'setOnEmpty' => false, 'on' => 'update'),
             array('created,last_login', 'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'insert')
+                'setOnEmpty' => false, 'on' => 'insert'),
+            array('api_token','default',
+                'value' => Utils::getRandStr(),
+                'setOnEmpty' => true, 'on' => 'insert'),
         ));
         
         return $newRules;

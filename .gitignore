@@ -1,3 +1,4 @@
+deploy.sh
 *.lock
 nbproject/
 .DS_Store

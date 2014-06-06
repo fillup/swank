@@ -57,7 +57,7 @@ class GitHubUserIdentity extends CUserIdentity
                     $userInfo = $this->getUserInformation();
                     if ($userInfo) {
                         try {
-                            $user = User::findOrCreate($userInfo['emails'][0]);
+                            $user = User::findOrCreate($userInfo['emails'][0]['email']);
                             $user->name = $userInfo['name'];
                             $user->access_token = $this->access_token;
                             if ($user->save()) {

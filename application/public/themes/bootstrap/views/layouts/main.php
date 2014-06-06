@@ -82,7 +82,7 @@ $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS
                 <?php $this->widget('zii.widgets.CMenu',array(
                     'htmlOptions'=>array('class'=>'nav navbar-nav pull-right'),
                     'items'=>array(
-                        array('label'=>'Fork Me', 'url'=>'http://github.com/'),
+                        array('label'=>'Fork Me', 'url'=>'http://github.com/fillup/swank'),
                         array('label'=>'Login with GitHub', 'url'=>array('/auth/login'), 
                               'visible'=>Yii::app()->user->isGuest, ),
                         array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/auth/logout'), 'visible'=>!Yii::app()->user->isGuest)
