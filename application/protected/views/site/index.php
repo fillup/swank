@@ -13,7 +13,7 @@ $this->pageTitle=Yii::app()->name;
             gives you a web based interface to create the Swagger spec files and 
             interact with your APIs.
         </p>
-        <p><a class="btn btn-primary btn-lg">Get Started</a></p>
+        <p><a class="btn btn-primary btn-lg" href="<?php echo Yii::app()->createUrl('/gen'); ?>">Get Started</a></p>
     </div>
 </div>
 <div class="row">
