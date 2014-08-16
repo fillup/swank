@@ -1,17 +1,26 @@
 <?php
-
 Yii::app()->bootstrap->register();
-$cs = Yii::app()->clientScript;
+$cs = Yii::app()->getClientScript();
 $cs->registerScriptFile(Yii::app()->baseUrl . "/js/handlebars-v1.3.0.js", CClientScript::POS_END);
 $cs->registerScriptFile(Yii::app()->baseUrl . "/js/swank.js", CClientScript::POS_END);
-
+if($this->route == 'ui/index'){
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/shred.bundle.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/jquery.slideto.min.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/jquery.wiggle.min.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/jquery.ba-bbq.min.js", CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/underscore-min.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/backbone-min.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/swagger.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/swagger-ui.js', CClientScript::POS_END);
+    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/highlight.7.3.pack.js', CClientScript::POS_END);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <!-- route: <?php echo $this->route; ?> -->
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="<?php echo Yii::app()->theme->baseUrl . "/assets/js/html5shiv.js"; ?>"></script>

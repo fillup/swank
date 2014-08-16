@@ -44,7 +44,7 @@ class ApiController extends Controller
     {
         $req = Yii::app()->request;
         /**
-         * If user is working with speicific application, make sure they own it
+         * If user is working with specific application, make sure they own it
          */
         if($id){
             $application = Application::model()->findByPk($id);

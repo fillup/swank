@@ -1,14 +1,8 @@
 <?php
-    $cs = Yii::app()->clientScript;
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/shred.bundle.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/jquery.slideto.min.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/jquery.wiggle.min.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->theme->baseUrl . "/assets/js/jquery.ba-bbq.min.js", CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/underscore-min.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/backbone-min.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/swagger.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/swagger-ui.js', CClientScript::POS_END);
-    $cs->registerScriptFile(Yii::app()->baseUrl . '/js/swagger/highlight.7.3.pack.js', CClientScript::POS_END);
+/**
+ * This view has additional javascript requirements.
+ * See public/themes/bootstrap/layouts/main.php
+ */
 ?>
 <link href='https://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
 <link href='<?php echo Yii::app()->baseUrl; ?>/css/swagger-ui-screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -28,7 +22,7 @@
             onFailure: function(data) {
                 log("Unable to Load SwaggerUI");
             },
-            docExpansion: "none"
+            docExpansion: "list"
         });
 <?php
     if($authorization_type == 'api_key'){

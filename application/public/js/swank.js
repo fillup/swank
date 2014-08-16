@@ -315,7 +315,7 @@ function updateParameter(id)
     var paramType = $((formId+' [name=paramType]')).val();
     var dataType = $((formId+' [name=dataType]')).val();
     var description = $((formId+' [name=description]')).val();
-    var required = $((formId+' [name=required]')).val();
+    var required = $((formId+' [name=required]:checked')).val();
     var operation_id = $((formId+' [name=operation_id]')).val();
     
     if(name.length < 1){

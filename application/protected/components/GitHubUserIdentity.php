@@ -74,15 +74,15 @@ class GitHubUserIdentity extends CUserIdentity
                         $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
                     }
                 } else {
-                    Yii::app()->user->setFlash('danger', "There was a problem with the response form GitHub, maybe try again in a moment? (".__LINE__.")");
+                    Yii::app()->user->setFlash('danger', "There was a problem with the response from GitHub, maybe try again in a moment? (".__LINE__.")");
                     $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
                 }
             } else {
-                Yii::app()->user->setFlash('danger', "There was a problem with the response form GitHub, maybe try again in a moment? (".__LINE__.")");
+                Yii::app()->user->setFlash('danger', "There was a problem with the response from GitHub, maybe try again in a moment? (".__LINE__.")");
                 $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
             }
         } else {
-            Yii::app()->user->setFlash('danger', "There was a problem with the response form GitHub, maybe try again in a moment? (".__LINE__.")");
+            Yii::app()->user->setFlash('danger', "There was a problem with the response from GitHub, maybe try again in a moment? (".__LINE__.")");
             $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
         }
 
@@ -120,11 +120,11 @@ class GitHubUserIdentity extends CUserIdentity
                     return false;
                 }
             } else {
-                Yii::app()->user->setFlash('danger', "There was a problem with the response form GitHub, maybe try again in a moment? (".__LINE__.")");
+                Yii::app()->user->setFlash('danger', "There was a problem with the response from GitHub, maybe try again in a moment? (".__LINE__.")");
                 return false;
             }
         } else {
-            Yii::app()->user->setFlash('danger', "There was a problem with the response form GitHub, maybe try again in a moment? (".__LINE__.")");
+            Yii::app()->user->setFlash('danger', "There was a problem with the response from GitHub, maybe try again in a moment? (".__LINE__.")");
             return false;
         }
     }

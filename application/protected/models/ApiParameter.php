@@ -82,7 +82,7 @@ class ApiParameter extends ApiParameterBase
             'description' => $this->description,
             'dataType' => $this->dataType,
             //'format' => $this->format,
-            'required' => $this->required,
+            'required' => $this->required ? true : false,
         );
         
         if(!is_null($this->minimum)){
