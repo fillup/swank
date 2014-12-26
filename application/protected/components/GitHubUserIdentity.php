@@ -57,14 +57,25 @@ class GitHubUserIdentity extends CUserIdentity
                     $userInfo = $this->getUserInformation();
                     if ($userInfo) {
                         try {
-                            $user = User::findOrCreate($userInfo['emails'][0]);
-                            $user->name = $userInfo['name'];
-                            $user->access_token = $this->access_token;
-                            if ($user->save()) {
-                                $this->loadIdentity($user);
-                            } else {
-                                Yii::app()->user->setFlash('danger', "There was a problem creating your account, maybe try again in a moment? (".__LINE__.")");
+                            $userEmail = false;
+                            foreach($userInfo['emails'] as $emailAcct){
+                                if($emailAcct['primary'] && $emailAcct['verified']){
+                                    $userEmail = $emailAcct['email'];
+                                }
+                            }
+                            if(!$userEmail){
+                                Yii::app()->user->setFlash('danger', "You must have at least one verified email address on your GitHub account. (".__LINE__.")");
                                 $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
+                            } else {
+                                $user = User::findOrCreate($userEmail);
+                                $user->name = $userInfo['name'];
+                                $user->access_token = $this->access_token;
+                                if ($user->save()) {
+                                    $this->loadIdentity($user);
+                                } else {
+                                    Yii::app()->user->setFlash('danger', "There was a problem creating your account, maybe try again in a moment? (".__LINE__.")");
+                                    $this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
+                                }
                             }
                         } catch (Exception $e) {
                             Yii::app()->user->setFlash('danger', "There was a problem creating your account, maybe try again in a moment? (".__LINE__.")");

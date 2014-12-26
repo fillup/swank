@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 # Install Apache and PHP (and any needed extensions).
-sudo apt-get install -y git curl php5 php5-curl php5-mysql mysql-server
+export DEBIAN_FRONTEND=noninteractive
+sudo -E apt-get install -y git curl apache2 php5 php5-cli php5-curl php5-mysql mysql-server-5.5
 
 # Mount synced folder as apache
-sudo mount -t vboxsf -o uid=`id -u www-data`,gid=`id -g www-data` /var/www/swank /var/www/swank
+# sudo mount -t vboxsf -o uid=`id -u www-data`,gid=`id -g www-data` /var/www/swank /var/www/swank
 
 # Make sure the timezone is set in php.ini.
 sudo sed -i".bak" "s/^\;date\.timezone.*$/date\.timezone = \"America\\/New_York\" /g" /etc/php5/apache2/php.ini
@@ -23,3 +24,6 @@ sudo service apache2 restart
 # Create the necessary tables/users for MySQL.
 /vagrant/createdb.sh swank swank swank
 /vagrant/createdb.sh swank_test swank_test swank_test
+
+# Run yii migrations
+/var/www/swank/protected/yiic migrate --interactive=0
